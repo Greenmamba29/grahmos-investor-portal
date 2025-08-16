@@ -1,17 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { ArrowLeft, Calculator, TrendingUp, DollarSign } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Calculator, TrendingUp, DollarSign, Sparkles, Shield, Mail } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { toast } from 'sonner';
 
 const InvestorPortal = () => {
   const { slug } = useParams();
+  const [mounted, setMounted] = useState(false);
   const [pre, setPre] = useState(5000000); // $5M
   const [ticket, setTicket] = useState(1000000); // $1M
   const [cap, setCap] = useState(8000000); // $8M
   const [discount, setDiscount] = useState(20); // 20%
+  
+  useEffect(() => {
+    setMounted(true);
+    // Welcome toast with smooth animation
+    toast.success(`Welcome to your portal, ${slug || 'Investor'}!`, {
+      description: 'Your private Grahmos investor dashboard is now active',
+      duration: 5000,
+    });
+  }, [slug]);
 
   // SAFE calculation
   const effectivePrice = Math.min(cap * (1 - discount/100), pre + ticket);
@@ -33,28 +45,48 @@ const InvestorPortal = () => {
     }).format(value);
   };
 
+  const handleContactTeam = () => {
+    toast.promise(
+      new Promise(resolve => setTimeout(resolve, 1500)),
+      {
+        loading: 'Connecting you with our team...',
+        success: 'Contact request sent! We\'ll get back to you within 24 hours.',
+        error: 'Failed to send contact request. Please try again.',
+        duration: 5000,
+      }
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 space-y-4 sm:space-y-0 transition-all duration-1000 ${mounted ? 'animate-slide-up opacity-100' : 'opacity-0'}`}>
           <div className="flex items-center space-x-4">
             <Button 
               variant="outline" 
               size="icon"
               onClick={() => window.history.back()}
-              className="border-white/20 hover:bg-white/10"
+              className="border-white/20 hover:bg-white/10 transition-all duration-300 hover:scale-105"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Welcome, {slug || 'Investor'}</h1>
-              <p className="text-white/70">Your Private Grahmos Investor Portal</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Welcome, {slug || 'Investor'}
+              </h1>
+              <p className="text-sm sm:text-base text-white/70">Your Private Grahmos Investor Portal</p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-white/60">Portal Access</p>
-            <p className="text-lg font-semibold">Active</p>
+          <div className="text-left sm:text-right">
+            <Badge className="bg-green-500/20 text-green-400 border-green-400/30 mb-2">
+              <Shield className="h-3 w-3 mr-1" />
+              Portal Access Active
+            </Badge>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-sm text-white/60">Live Session</span>
+            </div>
           </div>
         </div>
 
@@ -223,8 +255,12 @@ const InvestorPortal = () => {
                 <p className="text-sm text-white/70 mb-4">
                   Contact our investor relations team for more information about Grahmos.
                 </p>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                  Contact Team
+                <Button 
+                  onClick={handleContactTeam}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+                >
+                  <Mail className="h-4 w-4" />
+                  <span>Contact Team</span>
                 </Button>
               </CardContent>
             </Card>

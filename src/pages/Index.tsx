@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import CountdownTimer from '@/components/CountdownTimer';
 import SearchPreview from '@/components/SearchPreview';
-import WaitlistSignup from '@/components/WaitlistSignup';
+import EnhancedLogin from '@/components/EnhancedLogin';
 import SocialShare from '@/components/SocialShare';
 import FloatingElements from '@/components/FloatingElements';
 import Earth3D from '@/components/Earth3D';
@@ -24,7 +24,7 @@ const Index = () => {
         
         {/* Header Section */}
         <div className={`text-center mb-12 transition-all duration-1000 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
-          <h1 className="text-7xl md:text-9xl font-black gradient-text mb-6 tracking-tight">
+          <h1 className="text-7xl md:text-9xl font-black star-trek-header mb-6 tracking-tight">
             /GRAHMOS
           </h1>
           <p className="text-xl md:text-2xl text-white/80 font-light max-w-2xl mx-auto leading-relaxed">
@@ -44,7 +44,7 @@ const Index = () => {
 
         {/* Waitlist Signup */}
         <div className={`mb-12 transition-all duration-1000 delay-700 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
-          <WaitlistSignup />
+          <EnhancedLogin />
         </div>
 
         {/* Social Share */}
