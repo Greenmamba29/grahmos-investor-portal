@@ -1,24 +1,75 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, Settings, Bell, BarChart3, Calendar, FileText, Mail } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, User, Settings, Bell, BarChart3, Calendar, FileText, Mail, TestTube, Lock, Mail as MailIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Portal = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mounted, setMounted] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  
+  // Check if we're in test mode (local development)
+  const isTestMode = location.pathname === '/user-portal' || process.env.NODE_ENV === 'development';
+  
+  // Get user identifier - use slug if available, otherwise use 'User'
+  const userIdentifier = slug || 'User';
   
   useEffect(() => {
     setMounted(true);
-    // Welcome toast with smooth animation
-    toast.success(`Welcome to your portal, ${slug || 'User'}!`, {
-      description: 'Your private Grahmos dashboard is now active',
-      duration: 5000,
+    
+    // In test mode, auto-authenticate for demo purposes
+    if (isTestMode) {
+      setIsAuthenticated(true);
+      toast.success(`Welcome to your portal, ${userIdentifier}!`, {
+        description: '🧪 Test Mode - Development Environment',
+        duration: 5000,
+      });
+    } else {
+      // Check if user is authenticated (you can implement proper auth logic here)
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        setIsAuthenticated(true);
+        toast.success(`Welcome back, ${userIdentifier}!`, {
+          description: 'Your private Grahmos dashboard is now active',
+          duration: 5000,
+        });
+      }
+    }
+  }, [userIdentifier, isTestMode]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Simulate login process
+    setTimeout(() => {
+      setIsAuthenticated(true);
+      localStorage.setItem('authToken', 'demo-token');
+      toast.success('Login successful!', {
+        description: 'Welcome to your dashboard',
+        duration: 3000,
+      });
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('authToken');
+    toast.success('Logged out successfully', {
+      description: 'Return to landing page',
+      duration: 3000,
     });
-  }, [slug]);
+  };
 
   const handleGoBack = () => {
     navigate('/');
@@ -36,6 +87,88 @@ const Portal = () => {
     );
   };
 
+  // Show login form if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white flex items-center justify-center px-4">
+        <Card className="glass-morphism border-white/20 bg-black/20 backdrop-blur-xl w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-white">User Portal Access</CardTitle>
+            <p className="text-white/70">Sign in to access your dashboard</p>
+            {isTestMode && (
+              <div className="flex items-center justify-center space-x-2 mt-2">
+                <TestTube className="h-4 w-4 text-yellow-400" />
+                <span className="text-sm text-yellow-400 font-medium">🧪 Test Mode</span>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white/80">Email Address</Label>
+                <div className="relative">
+                  <MailIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={loginData.email}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                    placeholder="user@example.com"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-white/80">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={loginData.password}
+                    onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    <span>Signing in...</span>
+                  </div>
+                ) : (
+                  'Sign In'
+                )}
+              </Button>
+            </form>
+            
+            <div className="mt-6 text-center">
+              <Button 
+                variant="outline" 
+                onClick={handleGoBack}
+                className="border-white/20 hover:bg-white/10 text-white"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Home
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show dashboard if authenticated
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-x-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -52,9 +185,15 @@ const Portal = () => {
             </Button>
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Welcome, {slug || 'User'}
+                Welcome, {userIdentifier}
               </h1>
               <p className="text-sm sm:text-base text-white/70">Your Private Grahmos Dashboard</p>
+              {isTestMode && (
+                <div className="flex items-center space-x-2 mt-2">
+                  <TestTube className="h-4 w-4 text-yellow-400" />
+                  <span className="text-sm text-yellow-400 font-medium">🧪 Test Mode</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="text-left sm:text-right">
@@ -85,6 +224,17 @@ const Portal = () => {
                 <p className="text-white/80">
                   Welcome to your personal Grahmos dashboard! Here you can access all the features and tools available to platform users.
                 </p>
+                {isTestMode && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+                    <div className="flex items-center space-x-2 text-yellow-400">
+                      <TestTube className="h-4 w-4" />
+                      <span className="font-medium">Development Mode</span>
+                    </div>
+                    <p className="text-yellow-300/80 text-sm mt-1">
+                      This is a test environment. Features and data are simulated for development purposes.
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white/5 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-blue-400">0</div>
@@ -127,6 +277,38 @@ const Portal = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Test Mode Features */}
+            {isTestMode && (
+              <Card className="bg-white/10 backdrop-blur border-white/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-white">
+                    <TestTube className="h-5 w-5 text-yellow-400" />
+                    <span>Test Features</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3 p-3 bg-yellow-500/10 rounded-lg">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                      <span className="text-white/80">Simulated Data</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-yellow-500/10 rounded-lg">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                      <span className="text-white/80">Development Tools</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-yellow-500/10 rounded-lg">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                      <span className="text-white/80">Mock Authentication</span>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-yellow-500/10 rounded-lg">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                      <span className="text-white/80">Test Environment</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -144,8 +326,17 @@ const Portal = () => {
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
                     <User className="h-8 w-8 text-white" />
                   </div>
-                  <div className="text-lg font-semibold text-white">{slug || 'User'}</div>
-                  <div className="text-sm text-white/60">Platform User</div>
+                  <div className="text-lg font-semibold text-white">{userIdentifier}</div>
+                  <div className="text-sm text-white/60">
+                    {isTestMode ? 'Test User' : 'Platform User'}
+                  </div>
+                  {isTestMode && (
+                    <div className="mt-2">
+                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-400/30 text-xs">
+                        🧪 Test Mode
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -171,6 +362,24 @@ const Portal = () => {
                     <Mail className="h-4 w-4 mr-2" />
                     Contact Support
                   </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-red-500/20 hover:bg-red-500/10 text-red-400"
+                    onClick={handleLogout}
+                  >
+                    <Lock className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                  {isTestMode && (
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-yellow-500/20 hover:bg-yellow-500/10 text-yellow-400"
+                      onClick={() => navigate('/test-portal')}
+                    >
+                      <TestTube className="h-4 w-4 mr-2" />
+                      Test Portal
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -186,7 +395,15 @@ const Portal = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-white/70">Plan:</span>
-                    <span className="text-white">Basic</span>
+                    <span className="text-white">
+                      {isTestMode ? 'Test' : 'Basic'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/70">Mode:</span>
+                    <span className="text-white">
+                      {isTestMode ? 'Development' : 'Production'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-white/70">Member Since:</span>
@@ -201,7 +418,10 @@ const Portal = () => {
         {/* Footer */}
         <div className="mt-16 text-center text-white/60">
           <p className="text-sm">
-            This portal is for demonstration purposes. Features and access may vary.
+            {isTestMode 
+              ? '🧪 Test Environment - For Development Purposes Only'
+              : 'This portal is for demonstration purposes. Features and access may vary.'
+            }
           </p>
         </div>
       </div>

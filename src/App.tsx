@@ -23,6 +23,9 @@ const App = () => (
           
           {/* Investor portal routes */}
           <Route path="/investor/:slug" element={<InvestorPortal />} />
+          
+          {/* User portal routes - fixed to match expected /user-portal */}
+          <Route path="/user-portal" element={<Portal />} />
           <Route path="/portal/:slug" element={<Portal />} />
           
           {/* Test and development routes */}
@@ -31,7 +34,7 @@ const App = () => (
           
           {/* Redirect old routes to new ones */}
           <Route path="/investor" element={<Navigate to="/" replace />} />
-          <Route path="/portal" element={<Navigate to="/" replace />} />
+          <Route path="/portal" element={<Navigate to="/user-portal" replace />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
