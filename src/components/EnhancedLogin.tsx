@@ -163,9 +163,13 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
             onAuthSuccess(userData);
           }
 
-          // Navigate to investor portal
+          // Navigate to appropriate portal based on user type
           setTimeout(() => {
-            navigate(`/investor/${userData.slug}`);
+            if (userData.userType === 'investor') {
+              navigate(`/investor/${userData.slug}`);
+            } else {
+              navigate(`/portal/${userData.slug}`);
+            }
           }, 1500);
         } else {
           toast.error('Login failed', {
@@ -186,11 +190,18 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
     }
   };
 
+  // Handle direct navigation to specific tabs
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Reset form when switching tabs
+    setFormData({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '' });
+  };
+
   return (
     <div className="text-center max-w-2xl mx-auto">
       <Card className="glass-morphism border-white/20 bg-black/20 backdrop-blur-xl">
         <CardContent className="p-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-white/5 rounded-t-2xl">
               <TabsTrigger 
                 value="signup" 
