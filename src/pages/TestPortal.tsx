@@ -2,8 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, User, Mail, Calendar } from 'lucide-react';
 import InvestorPortal from './InvestorPortal';
+import { useNavigate } from 'react-router-dom';
 
 const TestPortal = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
@@ -16,6 +18,11 @@ const TestPortal = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="text-white">
+            <div className="mb-4">
+              <Button variant="outline" className="border-white/20 text-white" onClick={() => navigate('/') }>
+                <ArrowLeft className="h-4 w-4 mr-2" /> Back to Home
+              </Button>
+            </div>
             <div className="grid md:grid-cols-3 gap-4 mb-4">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-blue-400" />

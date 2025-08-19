@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,7 +35,7 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
     }));
   };
 
-  const validateForm = () => {
+  const validateForm = (mode: 'login' | 'signup' | 'waitlist') => {
     if (!formData.email || !formData.password) {
       toast.error('Please fill in all required fields', {
         description: 'Email and password are required',
@@ -44,7 +44,7 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
       return false;
     }
 
-    if (activeTab === 'signup') {
+    if (mode === 'signup') {
       if (formData.password !== formData.confirmPassword) {
         toast.error('Passwords do not match', {
           description: 'Please ensure both passwords match',
@@ -75,7 +75,7 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
       return;
     }
 
-    if (mode !== 'waitlist' && !validateForm()) return;
+    if (mode !== 'waitlist' && !validateForm(mode)) return;
 
     setIsLoading(true);
 
@@ -165,11 +165,8 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
 
           // Navigate to appropriate portal based on user type
           setTimeout(() => {
-            if (userData.userType === 'investor') {
-              navigate(`/investor/${userData.slug}`);
-            } else {
-              navigate(`/portal/${userData.slug}`);
-            }
+            const isInvestor = (userData.userType || '').toLowerCase() === 'investor';
+            navigate(isInvestor ? `/investor/${userData.slug}` : `/portal/${userData.slug}`);
           }, 1500);
         } else {
           toast.error('Login failed', {

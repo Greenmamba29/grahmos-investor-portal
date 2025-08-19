@@ -127,8 +127,18 @@ export const api = {
         };
       }
 
-      // In a real app, you'd verify the password hash here
-      // For demo purposes, we'll just return the user
+      // Verify password when stored
+      if (user.password_hash) {
+        const hashed = await hashPassword(password);
+        if (hashed !== user.password_hash) {
+          return {
+            success: false,
+            error: 'Invalid credentials',
+            details: 'Password is incorrect'
+          };
+        }
+      }
+
       return {
         success: true,
         data: {
