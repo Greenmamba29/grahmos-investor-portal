@@ -98,7 +98,7 @@ export const dbOperations = {
 
   async getUserByEmail(email: string) {
     const result = await sql`
-      SELECT id, email, first_name, last_name, user_type, is_verified, created_at
+      SELECT id, email, first_name, last_name, user_type, is_verified, created_at, password_hash
       FROM users 
       WHERE email = ${email}
     `;
