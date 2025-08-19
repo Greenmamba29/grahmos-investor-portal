@@ -17,6 +17,8 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('signup');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [successState, setSuccessState] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -120,6 +122,7 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
         });
 
         if (result.success) {
+          setSuccessState('signup');
           toast.success(
             `Account created! Welcome, ${formData.firstName || 'User'}!`,
             {
@@ -128,9 +131,14 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
             }
           );
           
-          // Switch to login tab
-          setActiveTab('login');
-          setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+          // Smooth transition to login tab
+          setIsTransitioning(true);
+          setTimeout(() => {
+            setActiveTab('login');
+            setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+            setIsTransitioning(false);
+            setSuccessState(null);
+          }, 1000);
         } else {
           toast.error('Account creation failed', {
             description: result.error || 'Please try again',
@@ -163,9 +171,14 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
             onAuthSuccess(userData);
           }
 
-          // Navigate to investor portal
+          // Navigate based on user type
           setTimeout(() => {
-            navigate(`/investor/${userData.slug}`);
+            if (userData.userType === 'investor') {
+              navigate(`/investor/${userData.slug}`);
+            } else {
+              // Navigate to standard user portal
+              navigate(`/portal/${userData.slug}`);
+            }
           }, 1500);
         } else {
           toast.error('Login failed', {

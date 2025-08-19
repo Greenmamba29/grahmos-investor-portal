@@ -3,7 +3,7 @@ import { sql } from './database';
 // Database schema creation
 export const createTables = async () => {
   try {
-    // Create users table
+    // Create users table with role-based access
     await sql`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -13,10 +13,16 @@ export const createTables = async () => {
         password_hash VARCHAR(255),
         is_verified BOOLEAN DEFAULT false,
         verification_token VARCHAR(255),
+        role VARCHAR(20) NOT NULL DEFAULT 'standard',
         user_type VARCHAR(50) DEFAULT 'user',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       )
+    `;
+
+    // Add role column if it doesn't exist (migration)
+    await sql`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'standard'
     `;
 
     // Create newsletter_signups table
@@ -46,6 +52,31 @@ export const createTables = async () => {
         accredited_investor BOOLEAN DEFAULT false,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    // Create investor applications table
+    await sql`
+      CREATE TABLE IF NOT EXISTS investor_applications (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        pitch TEXT,
+        accreditation BOOLEAN DEFAULT FALSE,
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        decided_by INTEGER REFERENCES users(id),
+        decided_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+
+    // Create admin actions audit log
+    await sql`
+      CREATE TABLE IF NOT EXISTS admin_actions (
+        id SERIAL PRIMARY KEY,
+        admin_id INTEGER NOT NULL REFERENCES users(id),
+        action VARCHAR(50) NOT NULL,
+        target_application_id INTEGER REFERENCES investor_applications(id),
+        created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `;
 
@@ -85,22 +116,120 @@ export const dbOperations = {
     firstName?: string;
     lastName?: string;
     passwordHash?: string;
+    role?: string;
     userType?: string;
   }) {
     const result = await sql`
-      INSERT INTO users (email, first_name, last_name, password_hash, user_type)
+      INSERT INTO users (email, first_name, last_name, password_hash, role, user_type)
       VALUES (${userData.email}, ${userData.firstName || null}, ${userData.lastName || null}, 
-              ${userData.passwordHash || null}, ${userData.userType || 'user'})
-      RETURNING id, email, first_name, last_name, user_type, created_at
+              ${userData.passwordHash || null}, ${userData.role || 'standard'}, ${userData.userType || 'user'})
+      RETURNING id, email, first_name, last_name, role, user_type, created_at
     `;
     return result[0];
   },
 
   async getUserByEmail(email: string) {
     const result = await sql`
-      SELECT id, email, first_name, last_name, user_type, is_verified, created_at
+      SELECT id, email, first_name, last_name, role, user_type, is_verified, created_at
       FROM users 
       WHERE email = ${email}
+    `;
+    return result[0];
+  },
+
+  async getUserByEmailWithPassword(email: string) {
+    const result = await sql`
+      SELECT id, email, first_name, last_name, password_hash, role, user_type, is_verified, created_at
+      FROM users 
+      WHERE email = ${email}
+    `;
+    return result[0];
+  },
+
+  async updateUserRole(userId: number, role: string) {
+    const result = await sql`
+      UPDATE users SET role = ${role}, updated_at = NOW()
+      WHERE id = ${userId}
+      RETURNING id, email, role
+    `;
+    return result[0];
+  },
+
+  // Investor operations
+  async createInvestorProfile(profileData: {
+    userId: number;
+    companyName?: string;
+    investmentRangeMin?: number;
+    investmentRangeMax?: number;
+    portfolioSize?: number;
+    investmentFocus?: string;
+    accreditedInvestor?: boolean;
+  }) {
+    const result = await sql`
+      INSERT INTO investor_profiles (
+        user_id, company_name, investment_range_min, investment_range_max,
+        portfolio_size, investment_focus, accredited_investor
+      )
+      VALUES (
+        ${profileData.userId}, ${profileData.companyName || null},
+        ${profileData.investmentRangeMin || null}, ${profileData.investmentRangeMax || null},
+        ${profileData.portfolioSize || null}, ${profileData.investmentFocus || null},
+        ${profileData.accreditedInvestor || false}
+      )
+      RETURNING id, user_id, company_name, created_at
+    `;
+    return result[0];
+  },
+
+  // Investor application operations
+  async createInvestorApplication(applicationData: {
+    userId: number;
+    pitch?: string;
+    accreditation?: boolean;
+  }) {
+    const result = await sql`
+      INSERT INTO investor_applications (user_id, pitch, accreditation)
+      VALUES (${applicationData.userId}, ${applicationData.pitch || null}, ${applicationData.accreditation || false})
+      ON CONFLICT (user_id) DO UPDATE SET
+        pitch = EXCLUDED.pitch,
+        accreditation = EXCLUDED.accreditation,
+        status = 'pending',
+        created_at = NOW()
+      RETURNING id, user_id, status, created_at
+    `;
+    return result[0];
+  },
+
+  async getInvestorApplications() {
+    const result = await sql`
+      SELECT ia.id, u.email, u.first_name, u.last_name, ia.status, ia.pitch, ia.accreditation, ia.created_at
+      FROM investor_applications ia 
+      JOIN users u ON u.id = ia.user_id
+      ORDER BY ia.created_at DESC
+    `;
+    return result;
+  },
+
+  async updateInvestorApplicationStatus(applicationId: number, status: string, adminId: number) {
+    const result = await sql`
+      UPDATE investor_applications
+      SET status = ${status}, decided_by = ${adminId}, decided_at = NOW()
+      WHERE id = ${applicationId}
+      RETURNING user_id, status
+    `;
+    return result[0];
+  },
+
+  // Admin operations
+  async logAdminAction(actionData: {
+    adminId: number;
+    action: string;
+    targetApplicationId?: number;
+  }) {
+    const result = await sql`
+      INSERT INTO admin_actions (admin_id, action, target_application_id)
+      VALUES (${actionData.adminId}, ${actionData.action}, ${actionData.targetApplicationId || null})
+      RETURNING id, created_at
     `;
     return result[0];
   },

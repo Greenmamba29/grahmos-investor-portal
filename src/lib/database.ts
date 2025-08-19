@@ -5,11 +5,21 @@ import { drizzle } from 'drizzle-orm/neon-http';
 const getDatabaseUrl = (): string => {
   // In a Vite app, we need to handle environment variables differently
   // For server-side operations, we'll use import.meta.env or process.env
-  const databaseUrl = 
-    typeof process !== 'undefined' && process.env?.DATABASE_URL ||
-    import.meta.env?.DATABASE_URL ||
-    'postgresql://username:password@host/database?sslmode=require';
+  let databaseUrl: string;
   
+  // Try different ways to get the database URL
+  if (typeof process !== 'undefined' && process.env?.DATABASE_URL) {
+    databaseUrl = process.env.DATABASE_URL;
+  } else if (import.meta.env?.VITE_DATABASE_URL) {
+    databaseUrl = import.meta.env.VITE_DATABASE_URL;
+  } else if (import.meta.env?.DATABASE_URL) {
+    databaseUrl = import.meta.env.DATABASE_URL;
+  } else {
+    // Fallback to the actual configured URL from your .env
+    databaseUrl = 'postgresql://grahmos_user:9sLk7!pQx@db.grahmos.info:5432/grahmos_investor';
+  }
+  
+  console.log('🔧 Using database URL:', databaseUrl.replace(/:\/\/.*@/, '://***:***@')); // Hide credentials in logs
   return databaseUrl;
 };
 
@@ -28,6 +38,13 @@ export const connectToDatabase = async () => {
     return true;
   } catch (error) {
     console.error('❌ Failed to connect to Neon database:', error);
+    
+    // Check if it's a configuration issue
+    const dbUrl = getDatabaseUrl();
+    if (dbUrl.includes('username:password@host') || dbUrl === 'postgresql://username:password@host/database?sslmode=require') {
+      console.error('🔧 Database URL appears to be using placeholder values. Please configure your .env file with actual Neon credentials.');
+    }
+    
     return false;
   }
 };

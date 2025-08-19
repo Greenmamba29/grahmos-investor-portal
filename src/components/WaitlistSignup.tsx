@@ -18,11 +18,10 @@ const WaitlistSignup = () => {
     if (!email) return;
 
     if (isInvestor) {
-      // Generate investor portal link
-      const slug = email.split('@')[0].replace(/[^a-z0-9]/gi, '-');
-      toast.success('Investor portal link generated! Redirecting...');
+      // Route to access portal for proper investor authentication
+      toast.success('Redirecting to investor access...');
       setTimeout(() => {
-        navigate(`/investor/${slug}`);
+        navigate('/access');
       }, 1000);
       return;
     }

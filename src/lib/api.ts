@@ -39,7 +39,7 @@ export const api = {
         data: result,
         message: `Successfully added ${data.email} to newsletter`
       };
-    } catch (error) {
+  } catch (error) {
       console.error('Newsletter signup error:', error);
       
       // Handle duplicate email error gracefully
@@ -51,10 +51,28 @@ export const api = {
         };
       }
       
+      // Handle connection errors
+      if (error instanceof Error && (error.message.includes('connection') || error.message.includes('timeout'))) {
+        return {
+          success: false,
+          error: 'Database connection issue',
+          details: 'Please check your internet connection and try again. If the problem persists, contact support.'
+        };
+      }
+      
+      // Handle authentication/permission errors
+      if (error instanceof Error && error.message.includes('authentication')) {
+        return {
+          success: false,
+          error: 'Database configuration issue',
+          details: 'The database is not properly configured. Please contact support.'
+        };
+      }
+      
       return {
         success: false,
         error: 'Failed to subscribe to newsletter',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: 'Please try again later. If the problem persists, contact support.'
       };
     }
   },
@@ -101,34 +119,112 @@ export const api = {
         return {
           success: false,
           error: 'Email already registered',
-          details: 'An account with this email already exists'
+          details: 'An account with this email already exists. Try logging in instead.'
+        };
+      }
+      
+      // Handle connection errors
+      if (error instanceof Error && (error.message.includes('connection') || error.message.includes('timeout'))) {
+        return {
+          success: false,
+          error: 'Database connection issue',
+          details: 'Unable to create account due to connectivity issues. Please try again.'
+        };
+      }
+      
+      // Handle authentication/permission errors  
+      if (error instanceof Error && error.message.includes('authentication')) {
+        return {
+          success: false,
+          error: 'Database configuration issue',
+          details: 'Account creation is temporarily unavailable. Please contact support.'
         };
       }
       
       return {
         success: false,
         error: 'Failed to create account',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: 'Please try again later. If the problem persists, contact support.'
       };
     }
   },
 
-  // User login (basic)
+  // Investor registration
+  async registerInvestor(data: {
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    password?: string;
+    companyName?: string;
+  }) {
+    try {
+      await initializeDatabase();
+      
+      // Create investor account
+      const result = await dbOperations.createUser({
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        passwordHash: data.password ? await hashPassword(data.password) : undefined,
+        userType: 'investor'
+      });
+
+      // Create investor profile
+      if (data.companyName && result.id) {
+        await dbOperations.createInvestorProfile({
+          userId: result.id,
+          companyName: data.companyName
+        });
+      }
+
+      return {
+        success: true,
+        data: result,
+        message: `Investor account created successfully for ${data.email}`
+      };
+    } catch (error) {
+      console.error('Investor registration error:', error);
+      
+      if (error instanceof Error && error.message.includes('duplicate key')) {
+        return {
+          success: false,
+          error: 'Email already registered',
+          details: 'An account with this email already exists. Try logging in instead.'
+        };
+      }
+      
+      return {
+        success: false,
+        error: 'Failed to create investor account',
+        details: 'Please try again later. If the problem persists, contact support.'
+      };
+    }
+  },
+
+  // User login with proper password verification
   async loginUser(email: string, password: string) {
     try {
       await initializeDatabase();
       
-      const user = await dbOperations.getUserByEmail(email);
+      const user = await dbOperations.getUserByEmailWithPassword(email);
       if (!user) {
         return {
           success: false,
-          error: 'User not found',
-          details: 'No account found with this email address'
+          error: 'Invalid credentials',
+          details: 'Email or password is incorrect'
         };
       }
 
-      // In a real app, you'd verify the password hash here
-      // For demo purposes, we'll just return the user
+      // Verify the password
+      const hashedInputPassword = await hashPassword(password);
+      if (user.password_hash && user.password_hash !== hashedInputPassword) {
+        return {
+          success: false,
+          error: 'Invalid credentials',
+          details: 'Email or password is incorrect'
+        };
+      }
+
       return {
         success: true,
         data: {
@@ -145,7 +241,7 @@ export const api = {
       return {
         success: false,
         error: 'Login failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: 'Unable to process login. Please try again.'
       };
     }
   },

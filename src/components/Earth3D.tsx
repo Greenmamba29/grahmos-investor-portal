@@ -1,21 +1,98 @@
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars } from '@react-three/drei';
+import { Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 const EarthSphere = () => {
   const meshRef = useRef<THREE.Mesh>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
+  const outerAtmosphereRef = useRef<THREE.Mesh>(null);
+  const nodesGroupRef = useRef<THREE.Group>(null);
+  const [earthTexture, setEarthTexture] = useState<THREE.Texture | null>(null);
+
+  // Try to load the uploaded earth image, fallback to generated texture
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    
+    // Try to load the uploaded earth image
+    loader.load(
+      '/earth-network.jpg', // This will be your uploaded image
+      (texture) => {
+        console.log('✅ Loaded uploaded earth image');
+        setEarthTexture(texture);
+      },
+      undefined,
+      (error) => {
+        console.log('📝 Using generated earth texture (uploaded image not found)');
+        // Create fallback texture if image not found
+        const canvas = createEarthTexture();
+        const texture = new THREE.CanvasTexture(canvas);
+        setEarthTexture(texture);
+      }
+    );
+  }, []);
 
   useFrame((state, delta) => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.15;
+      meshRef.current.rotation.y += delta * 0.1; // Slower, more realistic rotation
     }
     if (atmosphereRef.current) {
-      atmosphereRef.current.rotation.y += delta * 0.1;
+      atmosphereRef.current.rotation.y += delta * 0.08;
+    }
+    if (outerAtmosphereRef.current) {
+      outerAtmosphereRef.current.rotation.y -= delta * 0.05; // Counter-rotation for dynamic effect
+    }
+    
+    // Animate orbital nodes
+    if (nodesGroupRef.current) {
+      nodesGroupRef.current.rotation.y += delta * 0.3;
+      nodesGroupRef.current.children.forEach((child, index) => {
+        if (child instanceof THREE.Mesh) {
+          const material = child.material as THREE.MeshBasicMaterial;
+          // Pulsing glow effect
+          const pulse = Math.sin(state.clock.elapsedTime * 2 + index) * 0.3 + 0.7;
+          material.opacity = pulse;
+          
+          // Scale pulsing
+          const scale = pulse * 0.5 + 0.5;
+          child.scale.setScalar(scale);
+        }
+      });
     }
   });
+
+  // Generate orbital nodes
+  const createOrbitalNodes = () => {
+    const nodes = [];
+    const nodeCount = 20;
+    
+    for (let i = 0; i < nodeCount; i++) {
+      const theta = (i / nodeCount) * Math.PI * 2;
+      const phi = Math.acos(1 - 2 * (i / nodeCount)); // More uniform distribution
+      const radius = 3.2 + Math.random() * 0.8;
+      
+      const x = radius * Math.sin(phi) * Math.cos(theta);
+      const y = radius * Math.sin(phi) * Math.sin(theta);
+      const z = radius * Math.cos(phi);
+      
+      const colors = ['#3b82f6', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981'];
+      const color = colors[i % colors.length];
+      
+      nodes.push(
+        <mesh key={i} position={[x, y, z]}>
+          <sphereGeometry args={[0.03, 8, 8]} />
+          <meshBasicMaterial 
+            color={color}
+            transparent={true}
+            opacity={0.8}
+          />
+        </mesh>
+      );
+    }
+    
+    return nodes;
+  };
 
   return (
     <group>
@@ -23,34 +100,73 @@ const EarthSphere = () => {
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <sphereGeometry args={[2.5, 64, 64]} />
         <meshPhongMaterial>
-          <primitive 
-            object={new THREE.CanvasTexture(createEarthTexture())} 
-            attach="map" 
-          />
+          {earthTexture ? (
+            <primitive object={earthTexture} attach="map" />
+          ) : (
+            <primitive 
+              object={new THREE.CanvasTexture(createEarthTexture())} 
+              attach="map" 
+            />
+          )}
         </meshPhongMaterial>
       </mesh>
       
-      {/* Atmosphere glow */}
-      <mesh ref={atmosphereRef} position={[0, 0, 0]} scale={1.1}>
+      {/* Inner atmosphere glow */}
+      <mesh ref={atmosphereRef} position={[0, 0, 0]} scale={1.08}>
         <sphereGeometry args={[2.5, 32, 32]} />
         <meshBasicMaterial
           color="#87CEEB"
           transparent={true}
-          opacity={0.15}
+          opacity={0.2}
+          side={THREE.BackSide}
+        />
+      </mesh>
+      
+      {/* Middle atmosphere */}
+      <mesh position={[0, 0, 0]} scale={1.12}>
+        <sphereGeometry args={[2.5, 32, 32]} />
+        <meshBasicMaterial
+          color="#4FC3F7"
+          transparent={true}
+          opacity={0.12}
           side={THREE.BackSide}
         />
       </mesh>
       
       {/* Outer atmosphere */}
-      <mesh position={[0, 0, 0]} scale={1.15}>
+      <mesh ref={outerAtmosphereRef} position={[0, 0, 0]} scale={1.18}>
         <sphereGeometry args={[2.5, 32, 32]} />
         <meshBasicMaterial
-          color="#4FC3F7"
+          color="#60a5fa"
           transparent={true}
-          opacity={0.08}
+          opacity={0.06}
           side={THREE.BackSide}
         />
       </mesh>
+      
+      {/* Orbital connection nodes */}
+      <group ref={nodesGroupRef}>
+        {createOrbitalNodes()}
+      </group>
+      
+      {/* Connection lines/orbital rings */}
+      <group>
+        {[1.2, 1.4, 1.6].map((scale, index) => (
+          <mesh 
+            key={index} 
+            position={[0, 0, 0]} 
+            scale={scale}
+            rotation={[Math.PI / 4 * index, Math.PI / 6 * index, 0]}
+          >
+            <torusGeometry args={[2.5, 0.005, 8, 100]} />
+            <meshBasicMaterial
+              color={index === 0 ? '#3b82f6' : index === 1 ? '#06b6d4' : '#8b5cf6'}
+              transparent={true}
+              opacity={0.3}
+            />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 };
