@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, Settings, Bell, BarChart3, Calendar, FileText, Mail } from 'lucide-react';
+import { ArrowLeft, User, Settings, Bell, BarChart3, Calendar, FileText, Mail, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Portal = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -34,6 +36,15 @@ const Portal = () => {
         duration: 5000,
       }
     );
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully', {
+      description: 'You have been signed out of your portal',
+      duration: 3000,
+    });
+    navigate('/');
   };
 
   return (
@@ -62,10 +73,18 @@ const Portal = () => {
               <User className="h-3 w-3 mr-1" />
               Portal Access Active
             </Badge>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 mb-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
               <span className="text-sm text-white/60">Live Session</span>
             </div>
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="border-red-400/30 text-red-400 hover:bg-red-400/10 hover:border-red-400/50 transition-all duration-300"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
           </div>
         </div>
 

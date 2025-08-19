@@ -127,8 +127,22 @@ export const api = {
         };
       }
 
-      // In a real app, you'd verify the password hash here
-      // For demo purposes, we'll just return the user
+      // Verify password hash
+      if (user.password_hash) {
+        const isValidPassword = await verifyPassword(password, user.password_hash);
+        if (!isValidPassword) {
+          return {
+            success: false,
+            error: 'Invalid credentials',
+            details: 'Email or password is incorrect'
+          };
+        }
+      } else {
+        // For demo purposes, allow login without password verification
+        // In production, this should always require password verification
+        console.warn('User has no password hash - allowing login for demo purposes');
+      }
+
       return {
         success: true,
         data: {
@@ -198,6 +212,14 @@ async function hashPassword(password: string): Promise<string> {
   // For demo purposes, we'll just base64 encode
   // In production, use proper hashing like bcrypt
   return btoa(password + 'salt');
+}
+
+// Password verification
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  // For demo purposes, we'll just compare the hash
+  // In production, use proper hashing like bcrypt
+  const inputHash = btoa(password + 'salt');
+  return inputHash === hash;
 }
 
 // Email validation helper
