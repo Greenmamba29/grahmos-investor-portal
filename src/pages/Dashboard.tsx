@@ -19,21 +19,21 @@ import {
 import { useAuth } from '@/components/auth/AuthContext';
 
 export default function Dashboard() {
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !user) {
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, isLoading, navigate]);
 
   const handleSignOut = async () => {
-    await signOut();
+    logout();
     navigate('/');
   };
 
-  if (loading || !user || !profile) {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -118,7 +118,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold mb-2">
-                Welcome back, {profile.full_name || 'User'}
+                Welcome back, {user.firstName || 'User'}
               </h2>
               <p className="text-muted-foreground mb-4">
                 Your GrahmOS system is operational and ready for emergency communication.
@@ -126,11 +126,11 @@ export default function Dashboard() {
               <div className="flex items-center space-x-4">
                 <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                   <User className="w-3 h-3 mr-1" />
-                  {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Access
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)} Access
                 </Badge>
                 <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
                   <Activity className="w-3 h-3 mr-1" />
-                  {profile.approval_status.charAt(0).toUpperCase() + profile.approval_status.slice(1)}
+                  Active
                 </Badge>
               </div>
             </div>

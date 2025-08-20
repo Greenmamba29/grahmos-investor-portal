@@ -24,40 +24,30 @@ import {
 import { useAuth } from '@/components/auth/AuthContext';
 
 export default function InvestorPortal() {
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!isLoading && !user) {
       navigate('/auth');
       return;
     }
     
-    if (!loading && profile) {
-      if (profile.role !== 'investor' && profile.role !== 'admin') {
-        navigate('/dashboard');
-        return;
-      }
-      
-      if (profile.approval_status === 'pending') {
-        navigate('/dashboard');
-        return;
-      }
-      
-      if (profile.approval_status === 'rejected') {
+    if (!isLoading && user) {
+      if (user.role !== 'investor' && user.role !== 'admin') {
         navigate('/dashboard');
         return;
       }
     }
-  }, [user, profile, loading, navigate]);
+  }, [user, isLoading, navigate]);
 
   const handleSignOut = async () => {
-    await signOut();
+    logout();
     navigate('/');
   };
 
-  if (loading || !user || !profile) {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -68,33 +58,6 @@ export default function InvestorPortal() {
     );
   }
 
-  if (profile.approval_status !== 'approved') {
-    return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
-        <Card className="max-w-md backdrop-glass border-warning/20">
-          <CardHeader className="text-center">
-            <CardTitle className="text-warning">Access Pending</CardTitle>
-            <CardDescription>
-              Your investor portal access is pending admin approval.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-muted-foreground mb-4">
-              You will receive an email notification once your access has been approved.
-            </p>
-            <div className="space-y-2">
-              <Button onClick={() => navigate('/dashboard')} className="w-full">
-                Go to Standard Dashboard
-              </Button>
-              <Button variant="outline" onClick={handleSignOut} className="w-full">
-                Sign Out
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   const keyMetrics = [
     {
@@ -205,7 +168,7 @@ export default function InvestorPortal() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">
-            Welcome, {profile.full_name || 'Investor'}
+            Welcome, {user.firstName || 'Investor'}
           </h2>
           <p className="text-muted-foreground mb-4">
             Confidential investment metrics and strategic insights for GrahmOS
