@@ -6,8 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Building2, FileText, Shield } from 'lucide-react';
 import { toast } from 'sonner';
-import { useUser } from '@stackframe/react';
-import { apiRequest } from '@/lib/stack-api';
 
 interface User {
   id: number;
@@ -18,8 +16,9 @@ interface User {
 }
 
 export default function InvestorApply() {
-  const stackUser = useUser();
-  const [user, setUser] = useState<User | null>(null);
+  // Mock user - Stack Auth temporarily disabled
+  const stackUser = null;
+  const [user] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     pitch: '',
     accreditation: false
@@ -28,60 +27,18 @@ export default function InvestorApply() {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const loadUser = async () => {
-      if (stackUser) {
-        try {
-          const accessToken = await stackUser.getIdToken();
-          const response = await apiRequest.get('/.netlify/functions/auth-me', accessToken);
-          const data = await response.json();
-          
-          if (data.user) {
-            setUser(data.user);
-            if (data.user.role === 'investor') {
-              toast.info('You already have investor access!');
-              setTimeout(() => {
-                window.location.href = '/investor';
-              }, 2000);
-            }
-          }
-        } catch (error) {
-          console.error('Failed to load user:', error);
-        }
-      } else {
-        toast.error('Please sign in to apply for investor access');
-        setTimeout(() => {
-          window.location.href = '/handler/signin';
-        }, 2000);
-      }
-      setCheckingAuth(false);
-    };
-    
-    loadUser();
-  }, [stackUser]);
+    // Stack Auth temporarily disabled
+    toast.error('Authentication is temporarily disabled. Please check back later.');
+    setCheckingAuth(false);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      if (!stackUser) {
-        toast.error('Please sign in to submit application');
-        return;
-      }
-
-      const accessToken = await stackUser.getIdToken();
-      const response = await apiRequest.post('/.netlify/functions/investor-apply', formData, accessToken);
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success('Application submitted successfully!');
-        toast.info('We will review your application and get back to you soon.');
-        setTimeout(() => {
-          window.location.href = '/access';
-        }, 2000);
-      } else {
-        toast.error(data.error || 'Failed to submit application');
-      }
+      // Stack Auth temporarily disabled
+      toast.error('Authentication is temporarily disabled. Application submission unavailable.');
     } catch (error) {
       toast.error('Connection failed. Please try again.');
     } finally {

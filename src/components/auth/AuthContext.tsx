@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useUser } from '@stackframe/react';
+import { createContext, useContext, useState } from 'react';
 
 interface Profile {
   id: string;
@@ -25,30 +24,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const stackUser = useUser();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // Create mock profile based on StackFrame user
-  useEffect(() => {
-    if (stackUser) {
-      const mockProfile: Profile = {
-        id: stackUser.id || '1',
-        user_id: stackUser.id || '1',
-        email: stackUser.primaryEmail || 'user@example.com',
-        full_name: stackUser.displayName || 'User',
-        role: stackUser.primaryEmail?.includes('admin') ? 'admin' : 
-              stackUser.primaryEmail?.includes('investor') ? 'investor' : 'user',
-        approval_status: 'approved', // Default to approved for now
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      setProfile(mockProfile);
-    } else {
-      setProfile(null);
-    }
-    setLoading(false);
-  }, [stackUser]);
+  // Mock auth state - Stack Auth temporarily disabled
+  const stackUser = null;
+  const [profile] = useState<Profile | null>(null);
+  const [loading] = useState(false);
 
   const signUp = async (email: string, password: string, fullName: string, role: string = 'user') => {
     try {
@@ -72,9 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      if (stackUser) {
-        await stackUser.signOut();
-      }
+      // Mock sign out - Stack Auth temporarily disabled
       return { error: null };
     } catch (error) {
       return { error };

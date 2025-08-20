@@ -4,8 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Shield, CheckCircle, XCircle, Clock, User } from 'lucide-react';
 import { toast } from 'sonner';
-import { useUser } from '@stackframe/react';
-import { apiRequest } from '@/lib/stack-api';
 
 interface User {
   id: number;
@@ -29,88 +27,28 @@ interface Application {
 }
 
 export default function AdminRequests() {
-  const stackUser = useUser();
-  const [user, setUser] = useState<User | null>(null);
+  // Mock user - Stack Auth temporarily disabled
+  const stackUser = null;
+  const [user] = useState<User | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<number | null>(null);
 
   useEffect(() => {
-    const loadUser = async () => {
-      if (stackUser) {
-        try {
-          const accessToken = await stackUser.getIdToken();
-          const response = await apiRequest.get('/.netlify/functions/auth-me', accessToken);
-          const data = await response.json();
-          
-          if (data.user?.role === 'admin') {
-            setUser(data.user);
-            loadApplications();
-          } else {
-            toast.error('Admin access required');
-            setTimeout(() => {
-              window.location.href = '/access';
-            }, 2000);
-          }
-        } catch (error) {
-          console.error('Failed to load user:', error);
-          toast.error('Please sign in as an admin');
-          setTimeout(() => {
-          window.location.href = '/handler/signin';
-          }, 2000);
-        }
-      } else {
-        toast.error('Please sign in as an admin');
-        setTimeout(() => {
-          window.location.href = '/handler/signin';
-        }, 2000);
-      }
-    };
-    
-    loadUser();
-  }, [stackUser]);
+    // Stack Auth temporarily disabled
+    toast.error('Authentication is temporarily disabled. Admin access unavailable.');
+    setLoading(false);
+  }, []);
 
   const loadApplications = async () => {
-    if (!stackUser) return;
-    
-    try {
-      const accessToken = await stackUser.getIdToken();
-      const response = await apiRequest.get('/.netlify/functions/admin-requests', accessToken);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setApplications(data.applications || []);
-      } else {
-        toast.error('Failed to load applications');
-      }
-    } catch (error) {
-      toast.error('Connection failed');
-    } finally {
-      setLoading(false);
-    }
+    // Stack Auth temporarily disabled - no API calls
+    return;
   };
 
   const handleDecision = async (applicationId: number, decision: 'approved' | 'denied') => {
-    if (!stackUser) return;
-    
-    setProcessing(applicationId);
-
-    try {
-      const accessToken = await stackUser.getIdToken();
-      const response = await apiRequest.post('/.netlify/functions/admin-requests', { applicationId, decision }, accessToken);
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(`Application ${decision} successfully`);
-        await loadApplications(); // Reload applications
-      } else {
-        toast.error(data.error || `Failed to ${decision.slice(0, -1)} application`);
-      }
-    } catch (error) {
-      toast.error('Connection failed. Please try again.');
-    } finally {
-      setProcessing(null);
-    }
+    // Stack Auth temporarily disabled - no API calls
+    toast.error('Authentication is temporarily disabled. Admin functions unavailable.');
+    return;
   };
 
   const getStatusBadge = (status: string) => {

@@ -1,29 +1,18 @@
 import { useState } from 'react';
-import { useUser } from '@stackframe/react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { apiRequest } from '@/lib/stack-api';
 
 export default function AuthTest() {
-  const stackUser = useUser();
+  // Mock user - Stack Auth temporarily disabled
+  const stackUser = null;
   const [testResult, setTestResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const testAuthEndpoint = async () => {
     setLoading(true);
     try {
-      if (stackUser) {
-        console.log('Stack user exists:', stackUser);
-        const token = await stackUser.getIdToken();
-        console.log('Got token:', token ? 'Yes' : 'No');
-        
-        const response = await apiRequest.get('/.netlify/functions/test-auth', token);
-        const data = await response.json();
-        console.log('Test response:', data);
-        setTestResult(data);
-      } else {
-        setTestResult({ error: 'No Stack user found' });
-      }
+      // Stack Auth temporarily disabled
+      setTestResult({ error: 'Stack Auth is temporarily disabled' });
     } catch (error) {
       console.error('Test failed:', error);
       setTestResult({ error: error.message });
