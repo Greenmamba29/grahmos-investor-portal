@@ -1,114 +1,209 @@
 
 import { useState, useEffect } from 'react';
-import CountdownTimer from '@/components/CountdownTimer';
-import SearchPreview from '@/components/SearchPreview';
-import EnhancedLogin from '@/components/EnhancedLogin';
-import SocialShare from '@/components/SocialShare';
-import FloatingElements from '@/components/FloatingElements';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Users, Building2, Shield, ArrowLeft } from 'lucide-react';
+import { useUser } from '@stackframe/react';
+import { apiRequest } from '@/lib/stack-api';
 import Earth3D from '@/components/Earth3D';
+import FloatingElements from '@/components/FloatingElements';
+
+interface User {
+  id: number;
+  email: string;
+  role: string;
+  firstName?: string;
+  lastName?: string;
+  stackUserId?: string;
+  displayName?: string;
+}
 
 const Index = () => {
+  const stackUser = useUser();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    const loadUser = async () => {
+      if (stackUser) {
+        try {
+          const accessToken = await stackUser.getIdToken();
+          const response = await apiRequest.get('/.netlify/functions/auth-me', accessToken);
+          const data = await response.json();
+          
+          if (data.user) {
+            setUser(data.user);
+          }
+        } catch (error) {
+          console.error('Failed to load user:', error);
+        }
+      }
+      setLoading(false);
+    };
+    
+    loadUser();
+  }, [stackUser]);
+
+  const cards = [
+    {
+      title: 'Standard User',
+      description: 'Create an account for the basic dashboard and features.',
+      icon: Users,
+      color: 'bg-gradient-to-br from-blue-500 to-cyan-500',
+      action: () => (window.location.href = '/handler/signup'),
+      available: true
+    },
+    {
+      title: 'Investor Portal',
+      description: user?.role === 'investor' 
+        ? 'Access your investor dashboard and tools.' 
+        : 'Apply for investor access. We will review your application quickly.',
+      icon: Building2,
+      color: 'bg-gradient-to-br from-purple-500 to-indigo-500',
+      action: () => (window.location.href = user?.role === 'investor' ? '/investor' : '/investor/apply'),
+      available: true
+    },
+    user?.role === 'admin' && {
+      title: 'Super Admin',
+      description: 'Review investor applications and manage user roles.',
+      icon: Shield,
+      color: 'bg-gradient-to-br from-emerald-500 to-teal-500',
+      action: () => (window.location.href = '/admin/requests'),
+      available: true
+    }
+  ].filter(Boolean) as any[];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
       <Earth3D />
       <FloatingElements />
       
-      {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-8">
-        
-        {/* Enhanced Header Section */}
-        <div className={`text-center mb-16 transition-all duration-1000 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
-          {/* Glowing background circle for the title */}
-          <div className="relative mb-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-purple-500/20 rounded-full blur-3xl scale-150 animate-pulse"></div>
-            <h1 className="relative text-7xl md:text-9xl font-black star-trek-header mb-6 tracking-tight">
-              /GRAHMOS
-            </h1>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 p-6 relative z-10">
+        <div className="max-w-6xl mx-auto">
           
-          {/* Enhanced subtitle with gradient text */}
-          <div className="max-w-4xl mx-auto">
-            <p className="text-2xl md:text-3xl text-white/90 font-light leading-relaxed mb-4">
-              The future of search is here.
-            </p>
-            <p className="text-lg md:text-xl text-white/70 font-light leading-relaxed">
-              Experience lightning-fast, AI-powered search that understands context like never before.
-            </p>
+          <div className="text-center mb-16">
+            {/* GrahmOS Access Portal Header */}
+            <div className={`transition-all duration-1000 ${mounted ? 'animate-slide-up opacity-100' : 'opacity-0'}`}>
+              <div className="w-20 h-20 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-3xl flex items-center justify-center mx-auto mb-8">
+                <span className="text-3xl font-bold text-white">G</span>
+              </div>
+              
+              <h1 className="text-4xl font-bold text-white mb-4">
+                Access Portal
+              </h1>
+              <p className="text-xl text-white/70 mb-2">
+                Enter the GrahmOS ecosystem
+              </p>
+            </div>
             
-            {/* Feature highlights */}
-            <div className="flex flex-wrap justify-center gap-6 mt-8">
-              <div className="flex items-center space-x-2 text-blue-400/80">
-                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">AI-Powered</span>
-              </div>
-              <div className="flex items-center space-x-2 text-cyan-400/80">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">Lightning Fast</span>
-              </div>
-              <div className="flex items-center space-x-2 text-purple-400/80">
-                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium">Context Aware</span>
-              </div>
+            {/* Join the Future Section */}
+            <div className={`mt-16 transition-all duration-1000 delay-300 ${mounted ? 'animate-slide-up opacity-100' : 'opacity-0'}`}>
+              <h2 className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-8">
+                Join the Future
+              </h2>
+              <p className="text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed">
+                Access the most advanced emergency communication platform ever created
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Enhanced Search Preview */}
-        <div className={`mb-20 transition-all duration-1000 delay-300 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
-          <div className="relative">
-            {/* Glow effect behind search */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl scale-110"></div>
-            <SearchPreview />
+          {/* Access Cards */}
+          <div className={`grid md:grid-cols-3 gap-8 mb-8 transition-all duration-1000 delay-500 ${mounted ? 'animate-slide-up opacity-100' : 'opacity-0'}`}>
+            {cards.map((card, index) => {
+              const IconComponent = card.icon;
+              return (
+                <Card 
+                  key={index} 
+                  className="bg-white/10 backdrop-blur-lg border-white/20 hover:bg-white/15 transition-all duration-300 transform hover:scale-105"
+                >
+                  <CardContent className="p-8 text-center">
+                    <div className={`w-16 h-16 rounded-full ${card.color} flex items-center justify-center mx-auto mb-6`}>
+                      <IconComponent className="h-8 w-8 text-white" />
+                    </div>
+                    
+                    <h2 className="text-2xl font-bold text-white mb-4">
+                      {card.title}
+                    </h2>
+                    
+                    <p className="text-white/70 mb-6 leading-relaxed">
+                      {card.description}
+                    </p>
+                    
+                    <Button 
+                      onClick={card.action}
+                      className="w-full bg-white/20 hover:bg-white/30 text-white border-white/30 transition-all duration-300"
+                      disabled={!card.available}
+                    >
+                      Continue
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
-        </div>
 
-        {/* Enhanced Countdown Timer */}
-        <div className={`mb-20 transition-all duration-1000 delay-500 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
-          <div className="relative">
-            {/* Background glow */}
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-red-500/10 rounded-2xl blur-xl scale-110"></div>
-            <CountdownTimer />
-          </div>
-        </div>
+          {/* Status Info */}
+          {user && (
+            <div className="text-center">
+              <Card className="bg-white/5 backdrop-blur-lg border-white/10 max-w-md mx-auto">
+                <CardContent className="p-6">
+                  <p className="text-white/70 text-sm mb-2">Current Status</p>
+                  <p className="text-white font-semibold capitalize">
+                    {user.role} User
+                  </p>
+                  {user.role === 'standard' && (
+                    <p className="text-white/50 text-xs mt-2">
+                      Apply for investor access to unlock additional features
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-        {/* Enhanced Waitlist Signup */}
-        <div className={`mb-16 transition-all duration-1000 delay-700 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
-          <div className="relative">
-            {/* Background glow */}
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl scale-110"></div>
-            <EnhancedLogin />
-          </div>
-        </div>
-
-        {/* Enhanced Social Share */}
-        <div className={`transition-all duration-1000 delay-900 ${mounted ? 'animate-slide-up' : 'opacity-0'}`}>
-          <div className="relative">
-            {/* Background glow */}
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-yellow-500/10 to-green-500/10 rounded-2xl blur-xl scale-110"></div>
-            <SocialShare />
-          </div>
-        </div>
-
-      </div>
-
-      {/* Enhanced Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-8 text-center z-10">
-        <div className="relative">
-          {/* Background glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 rounded-full blur-xl scale-150"></div>
-          <p className="relative text-white/60 text-sm font-medium">
-            Built for the future. Launching soon.
-          </p>
-          <div className="flex justify-center space-x-4 mt-3">
-            <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
-            <div className="w-1 h-1 bg-cyan-400 rounded-full animate-pulse delay-100"></div>
-            <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse delay-200"></div>
+          {/* Login/Logout Actions */}
+          <div className="text-center mt-8">
+            {user ? (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  if (stackUser) {
+                    await stackUser.signOut();
+                    setUser(null);
+                    window.location.reload();
+                  }
+                }}
+                className="text-white border-white/30 hover:bg-white/10"
+              >
+                Sign Out
+              </Button>
+            ) : (
+              <div className="space-x-4">
+                <Button
+                  variant="outline"
+                  onClick={() => window.location.href = '/handler/signin'}
+                  className="text-white border-white/30 hover:bg-white/10"
+                >
+                  Sign In
+                </Button>
+                <Button
+                  onClick={() => window.location.href = '/handler/signup'}
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white"
+                >
+                  Create Account
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
