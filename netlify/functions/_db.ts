@@ -1,7 +1,8 @@
 import { neon } from '@neondatabase/serverless';
 
-const databaseUrl = process.env.DATABASE_URL?.replace('/grahmos_investor', '/neondb') || process.env.DATABASE_URL!;
-export const sql = neon(databaseUrl);
+const neonConnectionString = process.env.NEON_DATABASE_URL || 
+  `postgresql://grahmos_user:${process.env.DB_PASSWORD || '9sLk7!pQx'}@c-2.us-east-2.aws.neon.tech/neondb?sslmode=require`;
+export const sql = neon(neonConnectionString);
 
 export const isAdminEmail = (email: string) => {
   const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());
