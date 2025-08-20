@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,6 +20,7 @@ export default function InvestorApply() {
   // Mock user - Stack Auth temporarily disabled
   const stackUser = null;
   const [user] = useState<User | null>(null);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     pitch: '',
     accreditation: false
@@ -73,7 +75,7 @@ export default function InvestorApply() {
       <div className="max-w-2xl mx-auto">
         <Button
           variant="ghost"
-          onClick={() => window.location.href = '/access'}
+          onClick={() => navigate('/auth')}
           className="text-white/70 hover:text-white mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />

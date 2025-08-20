@@ -21,7 +21,7 @@ const WaitlistSignup = () => {
       // Route to access portal for proper investor authentication
       toast.success('Redirecting to investor access...');
       setTimeout(() => {
-        navigate('/access');
+        navigate('/auth');
       }, 1000);
       return;
     }

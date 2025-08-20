@@ -70,7 +70,6 @@ const App = () => (
                 
                 {/* Auth routes (no layout) */}
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/access" element={<Navigate to="/" replace />} />
                 
                 {/* Protected routes (no layout) */}
                 <Route path="/dashboard" element={<Dashboard />} />

@@ -50,7 +50,7 @@ export function Navigation() {
                 </Link>
               );
             })}
-            <Link to="/access">
+            <Link to="/auth">
               <Button variant="default" className="ml-4 glow">
                 Access Portal
                 <ChevronRight className="ml-2 h-4 w-4" />
@@ -92,7 +92,7 @@ export function Navigation() {
                 </Link>
               );
             })}
-            <Link to="/access">
+            <Link to="/auth">
               <Button variant="default" className="w-full mt-4">
                 Access Portal
               </Button>
