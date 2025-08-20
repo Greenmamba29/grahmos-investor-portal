@@ -1,7 +1,15 @@
 {
-  "name": "grahmos-investor-portal",
+  "name": "grahmos-connect-investor-portal",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "description": "GrahmOS Connect - Advanced investor portal and emergency communication platform",
+  "homepage": "https://grahmos.info",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Greenmamba29/grahmos-investor-portal"
+  },
+  "keywords": ["grahmos", "investor-portal", "emergency-communication", "react", "typescript"],
+  "author": "GrahmOS Team",
   "type": "module",
   "scripts": {
     "dev": "netlify dev",
