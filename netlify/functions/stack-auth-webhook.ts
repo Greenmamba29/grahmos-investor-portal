@@ -11,8 +11,8 @@ interface StackAuthWebhookPayload {
       displayName: string | null;
       profileImageUrl: string | null;
       signedUpAtMillis: number;
-      clientMetadata: Record<string, any>;
-      serverMetadata: Record<string, any>;
+      clientMetadata: Record<string, unknown>;
+      serverMetadata: Record<string, unknown>;
     };
   };
 }

@@ -11,14 +11,30 @@ interface Profile {
   updated_at: string;
 }
 
+interface User {
+  id: string;
+  email: string;
+  [key: string]: unknown;
+}
+
+interface Session {
+  user: User;
+  [key: string]: unknown;
+}
+
+interface AuthError {
+  message?: string;
+  [key: string]: unknown;
+}
+
 interface AuthContextType {
-  user: any | null;
-  session: any | null;
+  user: User | null;
+  session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role?: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role?: string) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signOut: () => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

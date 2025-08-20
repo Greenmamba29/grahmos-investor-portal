@@ -9,8 +9,17 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { api, validateEmail, generateSlug } from '@/lib/api';
 
+interface UserData {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName?: string;
+  userType: string;
+  slug: string;
+}
+
 interface EnhancedLoginProps {
-  onAuthSuccess?: (userData: any) => void;
+  onAuthSuccess?: (userData: UserData) => void;
 }
 
 const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
