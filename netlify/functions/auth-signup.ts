@@ -1,7 +1,5 @@
 import type { Handler } from '@netlify/functions';
 import { json } from './_db';
-import { dbOperations } from '../../src/lib/schema';
-import { authUtils } from '../../src/lib/auth';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -20,7 +18,10 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const { email, password, firstName, lastName, userType } = JSON.parse(event.body || '{}');
+    const { dbOperations } = await import('../../src/lib/schema');
+    const { authUtils } = await import('../../src/lib/auth');
+    
+    const { email, password, fullName, role } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
       return json(400, { 
@@ -47,13 +48,17 @@ export const handler: Handler = async (event) => {
     const bcrypt = await import('bcryptjs');
     const passwordHash = await bcrypt.hash(password, 12);
 
+    const nameParts = (fullName || '').split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
     const user = await dbOperations.createUser({
       email,
       firstName,
       lastName,
       passwordHash,
-      userType: userType || 'user',
-      role: 'standard'
+      userType: role || 'standard',
+      role: role === 'investor' ? 'investor' : 'standard'
     });
 
     const userSession = {
@@ -86,7 +91,7 @@ export const handler: Handler = async (event) => {
     console.error('Signup error:', error);
     return json(500, {
       error: 'Signup failed',
-      details: 'Internal server error'
+      details: error instanceof Error ? error.message : 'Internal server error'
     });
   }
 };
