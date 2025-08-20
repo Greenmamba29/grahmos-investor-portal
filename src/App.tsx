@@ -43,7 +43,7 @@ const App = () => (
               <Sonner />
               <Routes>
                 <Route path="/handler/*" element={<HandlerRoutes />} />
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<AccessPortal />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/access" element={<AccessPortal />} />
                 <Route path="/investor" element={<InvestorPortal />} />
