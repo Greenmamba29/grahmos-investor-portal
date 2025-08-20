@@ -264,4 +264,17 @@
     0%, 100% { opacity: 0.6; transform: scale(1); }
     50% { opacity: 1; transform: scale(1.1); }
   }
+
+  /* Add missing animation classes */
+  .animate-realistic-orbit {
+    animation: realistic-orbit 20s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: animate-float 3s ease-in-out infinite;
+  }
 }

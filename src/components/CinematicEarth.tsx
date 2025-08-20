@@ -137,13 +137,16 @@ const CinematicEarth = () => {
         >
           {/* Earth Image */}
           <div className="relative w-full h-full">
-            <img 
-              src="/lovable-uploads/019e6fec-6425-4a6a-b553-9b8957969d11.png" 
-              alt="Earth" 
-              className="w-full h-full object-cover rounded-full glow-strong"
+            <div 
+              className="w-full h-full rounded-full glow-strong bg-gradient-to-br from-blue-600 via-green-600 to-blue-800 shadow-2xl"
               style={{
                 filter: 'brightness(1.1) contrast(1.2) saturate(1.3)',
-                animation: 'earth-rotation 60s linear infinite'
+                animation: 'earth-rotation 60s linear infinite',
+                backgroundImage: `
+                  radial-gradient(ellipse at 30% 20%, rgba(34, 139, 34, 0.8) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 60%, rgba(30, 144, 255, 0.6) 0%, transparent 50%),
+                  radial-gradient(ellipse at 20% 80%, rgba(50, 205, 50, 0.4) 0%, transparent 50%)
+                `
               }}
             />
             
