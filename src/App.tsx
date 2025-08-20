@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { stackClientApp } from "./stack";
 import { Layout } from "@/components/Layout";
 import { AuthProvider } from "@/components/auth/AuthContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Overview from "./pages/Overview";
 import MarketAnalysis from "./pages/MarketAnalysis";
 import Product from "./pages/Product";
@@ -26,6 +27,7 @@ import Login from "./pages/Login";
 import InvestorApply from "./pages/InvestorApply";
 import AdminRequests from "./pages/AdminRequests";
 import AuthTest from "./pages/AuthTest";
+import EnvTest from "./pages/EnvTest";
 
 const queryClient = new QueryClient();
 
@@ -41,15 +43,16 @@ function HandlerRoutes() {
 }
 
 const App = () => (
-  <Suspense fallback={"Loading..."}>
-    <BrowserRouter>
-      <StackProvider app={stackClientApp}>
-        <StackTheme>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <AuthProvider>
-                <Toaster />
-                <Sonner />
+  <ErrorBoundary>
+    <Suspense fallback={"Loading..."}>
+      <BrowserRouter>
+        <StackProvider app={stackClientApp}>
+          <StackTheme>
+            <QueryClientProvider client={queryClient}>
+              <TooltipProvider>
+                <AuthProvider>
+                  <Toaster />
+                  <Sonner />
                 <Routes>
                 {/* Stack Auth Handler */}
                 <Route path="/handler/*" element={<HandlerRoutes />} />
@@ -82,6 +85,7 @@ const App = () => (
                 <Route path="/test-portal" element={<TestPortal />} />
                 <Route path="/demo" element={<TestPortal />} />
                 <Route path="/auth-test" element={<AuthTest />} />
+                <Route path="/env-test" element={<EnvTest />} />
                 
                 {/* Redirects */}
                 <Route path="/portal" element={<Navigate to="/" replace />} />
@@ -96,6 +100,7 @@ const App = () => (
       </StackProvider>
     </BrowserRouter>
   </Suspense>
+  </ErrorBoundary>
 );
 
 export default App;
