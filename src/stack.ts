@@ -11,8 +11,8 @@ export const stackClientApp = new StackClientApp({
   urls: {
     signIn: "/handler/signin",
     signUp: "/handler/signup",
-    afterSignIn: "/access",
-    afterSignUp: "/access",
+    afterSignIn: "/dashboard",
+    afterSignUp: "/dashboard",
     afterSignOut: "/",
   }
 });

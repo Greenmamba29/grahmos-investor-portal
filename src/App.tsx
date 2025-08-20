@@ -12,6 +12,7 @@ import Portal from "./pages/Portal";
 import TestPortal from "./pages/TestPortal";
 import NotFound from "./pages/NotFound";
 import AccessPortal from "./pages/AccessPortal";
+import Dashboard from "./pages/Dashboard";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import InvestorApply from "./pages/InvestorApply";
@@ -43,6 +44,7 @@ const App = () => (
               <Routes>
                 <Route path="/handler/*" element={<HandlerRoutes />} />
                 <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/access" element={<AccessPortal />} />
                 <Route path="/investor" element={<InvestorPortal />} />
                 <Route path="/portal/:slug" element={<Portal />} />
