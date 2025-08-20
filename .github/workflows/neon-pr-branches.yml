@@ -41,25 +41,12 @@ jobs:
         env:
           DATABASE_URL: "${{ steps.create.outputs.db_url_pooled }}"
       
-      - name: Comment PR with Database Info
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const comment = `🚀 **Preview Environment Ready!**
-            
-            **Database Branch:** \`preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}\`
-            **Database URL:** Available in Netlify deploy preview environment
-            
-            The database has been provisioned and is ready for testing.
-            
-            > **Note:** This preview database will be automatically deleted when the PR is closed.`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+      - name: Log Database Info
+        run: |
+          echo "🚀 Preview Environment Ready!"
+          echo "Database Branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}"
+          echo "Database URL: Available in Netlify deploy preview environment"
+          echo "Note: This preview database will be automatically deleted when the PR is closed."
 
   delete_neon_branch:
     name: Delete Neon Branch
@@ -74,19 +61,8 @@ jobs:
           branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}
           api_key: ${{ secrets.NEON_API_KEY }}
           
-      - name: Comment PR with Cleanup Info
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const comment = `🧹 **Preview Environment Cleaned Up**
-            
-            The preview database branch \`preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}\` has been deleted.
-            
-            Thank you for your contribution! 🎉`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+      - name: Log Cleanup Info
+        run: |
+          echo "🧹 Preview Environment Cleaned Up"
+          echo "The preview database branch preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }} has been deleted."
+          echo "Thank you for your contribution! 🎉"

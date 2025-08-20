@@ -216,8 +216,7 @@ export const api = {
       }
 
       // Verify the password
-      const hashedInputPassword = await hashPassword(password);
-      if (user.password_hash && user.password_hash !== hashedInputPassword) {
+      if (!user.password_hash || !(await verifyPassword(password, user.password_hash))) {
         return {
           success: false,
           error: 'Invalid credentials',
@@ -289,11 +288,15 @@ export const api = {
   }
 };
 
-// Simple password hashing (in production, use bcrypt or similar)
 async function hashPassword(password: string): Promise<string> {
-  // For demo purposes, we'll just base64 encode
-  // In production, use proper hashing like bcrypt
-  return btoa(password + 'salt');
+  const bcrypt = await import('bcryptjs');
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
+}
+
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  const bcrypt = await import('bcryptjs');
+  return await bcrypt.compare(password, hash);
 }
 
 // Email validation helper
