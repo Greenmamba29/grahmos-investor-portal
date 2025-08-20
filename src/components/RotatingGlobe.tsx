@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 
 const RotatingGlobe = () => {
@@ -19,7 +18,7 @@ const RotatingGlobe = () => {
       lines.push(
         <div
           key={`lat-${i}`}
-          className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent"
+          className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"
           style={{
             top: `${top}%`,
             opacity: opacity,
@@ -36,7 +35,7 @@ const RotatingGlobe = () => {
       lines.push(
         <div
           key={`lon-${i}`}
-          className="absolute top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent"
+          className="absolute top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent"
           style={{
             left: `${left}%`,
             transformOrigin: 'center',
@@ -61,37 +60,63 @@ const RotatingGlobe = () => {
       nodes.push(
         <div
           key={`node-${i}`}
-          className="absolute w-1 h-1 bg-blue-400 rounded-full animate-pulse"
+          className="absolute w-2 h-2 bg-primary rounded-full animate-pulse-glow glow"
           style={{
             left: `${x}%`,
             top: `${y}%`,
             animationDelay: `${i * 0.2}s`,
-            boxShadow: '0 0 4px rgba(59, 130, 246, 0.8)'
           }}
-        />
+        >
+          {/* Electric connection lines */}
+          <div 
+            className="absolute inset-0 rounded-full animate-ping"
+            style={{
+              background: 'radial-gradient(circle, hsl(var(--primary) / 0.8) 0%, transparent 70%)',
+              animationDelay: `${i * 0.3}s`
+            }}
+          />
+        </div>
       );
     }
     return nodes;
   };
 
+  // Generate electric arcs between nodes
+  const generateElectricArcs = () => {
+    const arcs = [];
+    for (let i = 0; i < 8; i++) {
+      const startAngle = (i / 8) * 360;
+      const endAngle = ((i + 2) / 8) * 360;
+      
+      arcs.push(
+        <div
+          key={`arc-${i}`}
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background: `conic-gradient(from ${startAngle}deg, transparent 0deg, hsl(var(--primary) / 0.2) ${Math.abs(endAngle - startAngle) / 4}deg, transparent ${Math.abs(endAngle - startAngle) / 2}deg)`,
+            animation: `spin 8s linear infinite`,
+            animationDelay: `${i * 0.5}s`
+          }}
+        />
+      );
+    }
+    return arcs;
+  };
+
   return (
-    <div className="relative w-80 h-80 mx-auto">
+    <div className="relative w-96 h-96 mx-auto">
       {/* Main Globe Container */}
       <div 
-        className={`relative w-full h-full rounded-full transition-all duration-1000 ${
-          mounted ? 'animate-globe-rotate' : ''
+        className={`relative w-full h-full rounded-full transition-all duration-1000 glow animate-float ${
+          mounted ? 'animate-spin-slow' : ''
         }`}
         style={{
           background: `
-            radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 70% 70%, rgba(6, 182, 212, 0.2) 0%, transparent 50%),
-            radial-gradient(ellipse at center, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)
+            radial-gradient(circle at 30% 30%, hsl(var(--primary) / 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 70% 70%, hsl(var(--primary-light) / 0.2) 0%, transparent 50%),
+            radial-gradient(ellipse at center, hsl(var(--background-secondary)) 0%, hsl(var(--background)) 100%)
           `,
-          border: '1px solid rgba(59, 130, 246, 0.3)',
-          boxShadow: `
-            0 0 50px rgba(59, 130, 246, 0.2),
-            inset 0 0 50px rgba(6, 182, 212, 0.1)
-          `
+          border: '1px solid hsl(var(--primary) / 0.3)',
         }}
       >
         {/* Grid Lines */}
@@ -104,38 +129,74 @@ const RotatingGlobe = () => {
           {generateNodes()}
         </div>
 
+        {/* Electric Arcs */}
+        <div className="absolute inset-0 rounded-full overflow-hidden">
+          {generateElectricArcs()}
+        </div>
+
         {/* Glowing Edge Effect */}
         <div 
-          className="absolute inset-0 rounded-full"
+          className="absolute inset-0 rounded-full animate-spin-slow"
           style={{
             background: `
               conic-gradient(from 0deg at 50% 50%, 
                 transparent 0deg, 
-                rgba(59, 130, 246, 0.3) 90deg, 
+                hsl(var(--primary) / 0.3) 90deg, 
                 transparent 180deg,
-                rgba(6, 182, 212, 0.3) 270deg,
+                hsl(var(--primary-light) / 0.3) 270deg,
                 transparent 360deg
               )
             `,
-            animation: 'spin 20s linear infinite'
           }}
         />
 
         {/* Inner Glow */}
         <div 
-          className="absolute inset-4 rounded-full opacity-60"
+          className="absolute inset-4 rounded-full opacity-60 animate-pulse-glow"
           style={{
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%)'
+            background: 'radial-gradient(circle, hsl(var(--primary) / 0.2) 0%, transparent 70%)'
+          }}
+        />
+
+        {/* Core */}
+        <div 
+          className="absolute inset-1/3 rounded-full glow-strong animate-pulse-glow"
+          style={{
+            background: 'radial-gradient(circle, hsl(var(--primary) / 0.8) 0%, hsl(var(--primary) / 0.3) 50%, transparent 100%)'
           }}
         />
       </div>
 
-      {/* Orbital Ring */}
-      <div className="absolute inset-0 rounded-full border border-cyan-400/20 animate-pulse" 
+      {/* Orbital Rings */}
+      <div className="absolute inset-0 rounded-full border border-primary/20 animate-ping" 
            style={{
              transform: 'rotate3d(1, 1, 0, 45deg)',
-             boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)'
+             animationDuration: '4s'
            }} 
+      />
+      <div className="absolute inset-2 rounded-full border border-primary/10 animate-ping" 
+           style={{
+             transform: 'rotate3d(1, -1, 0, 60deg)',
+             animationDuration: '6s',
+             animationDelay: '1s'
+           }} 
+      />
+
+      {/* Scanning Lines */}
+      <div 
+        className="absolute inset-0 rounded-full overflow-hidden"
+        style={{
+          background: `
+            linear-gradient(90deg, 
+              transparent 0%, 
+              hsl(var(--primary) / 0.1) 45%, 
+              hsl(var(--primary) / 0.3) 50%, 
+              hsl(var(--primary) / 0.1) 55%, 
+              transparent 100%
+            )
+          `,
+          animation: 'scanner 3s ease-in-out infinite'
+        }}
       />
     </div>
   );

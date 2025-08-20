@@ -6,13 +6,21 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-route
 import { StackHandler, StackProvider, StackTheme } from "@stackframe/react";
 import { Suspense } from "react";
 import { stackClientApp } from "./stack";
-import Index from "./pages/Index";
+import { Layout } from "@/components/Layout";
+import { AuthProvider } from "@/components/auth/AuthContext";
+import Overview from "./pages/Overview";
+import MarketAnalysis from "./pages/MarketAnalysis";
+import Product from "./pages/Product";
+import Competitive from "./pages/Competitive";
+import Financial from "./pages/Financial";
+import Team from "./pages/Team";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import InvestorPortal from "./pages/InvestorPortal";
+import NotFound from "./pages/NotFound";
+import LegacyAccessPortal from "./pages/LegacyAccessPortal";
 import Portal from "./pages/Portal";
 import TestPortal from "./pages/TestPortal";
-import NotFound from "./pages/NotFound";
-import AccessPortal from "./pages/AccessPortal";
-import Dashboard from "./pages/Dashboard";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import InvestorApply from "./pages/InvestorApply";
@@ -39,16 +47,33 @@ const App = () => (
         <StackTheme>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
+              <AuthProvider>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                {/* Stack Auth Handler */}
                 <Route path="/handler/*" element={<HandlerRoutes />} />
-                <Route path="/" element={<AccessPortal />} />
+                
+                {/* Main Public Routes with Layout - New GrahmOS Connect Hub */}
+                <Route path="/" element={<Layout><Overview /></Layout>} />
+                <Route path="/overview" element={<Layout><Overview /></Layout>} />
+                <Route path="/market" element={<Layout><MarketAnalysis /></Layout>} />
+                <Route path="/product" element={<Layout><Product /></Layout>} />
+                <Route path="/competitive" element={<Layout><Competitive /></Layout>} />
+                <Route path="/financial" element={<Layout><Financial /></Layout>} />
+                <Route path="/team" element={<Layout><Team /></Layout>} />
+                
+                {/* Auth routes (no layout) */}
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/access" element={<LegacyAccessPortal />} />
+                
+                {/* Protected routes (no layout) */}
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/access" element={<AccessPortal />} />
                 <Route path="/investor" element={<InvestorPortal />} />
+                <Route path="/investor-portal" element={<InvestorPortal />} />
+                
+                {/* Legacy routes for backward compatibility */}
                 <Route path="/portal/:slug" element={<Portal />} />
-                {/* Legacy custom auth routes */}
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/investor/apply" element={<InvestorApply />} />
@@ -57,11 +82,14 @@ const App = () => (
                 <Route path="/test-portal" element={<TestPortal />} />
                 <Route path="/demo" element={<TestPortal />} />
                 <Route path="/auth-test" element={<AuthTest />} />
-                {/* Redirect old routes to new ones */}
+                
+                {/* Redirects */}
                 <Route path="/portal" element={<Navigate to="/" replace />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
+                
+                {/* 404 with Layout */}
+                <Route path="*" element={<Layout><NotFound /></Layout>} />
               </Routes>
+              </AuthProvider>
             </TooltipProvider>
           </QueryClientProvider>
         </StackTheme>

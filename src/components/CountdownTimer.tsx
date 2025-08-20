@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 const CountdownTimer = () => {
@@ -42,22 +41,25 @@ const CountdownTimer = () => {
   ];
 
   return (
-    <div className="text-center">
-      <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">
-        Launch Countdown
+    <div className="text-center py-16">
+      <h2 className="text-3xl md:text-4xl font-bold text-gradient mb-4">
+        Platform Launch Countdown
       </h2>
+      <p className="text-xl text-muted-foreground mb-8">
+        Next-generation emergency communication system
+      </p>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
         {timeUnits.map((unit, index) => (
           <div
             key={unit.label}
-            className="glass-morphism rounded-2xl p-6 transform hover:scale-105 transition-all duration-300"
+            className="backdrop-glass rounded-2xl p-6 hover:glow-strong transition-all duration-300 hover:scale-105"
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className="text-4xl md:text-5xl font-black gradient-text mb-2">
+            <div className="text-4xl md:text-5xl font-black text-gradient mb-2 animate-pulse-glow">
               {unit.value.toString().padStart(2, '0')}
             </div>
-            <div className="text-white/60 text-sm font-medium uppercase tracking-wider">
+            <div className="text-muted-foreground text-sm font-medium uppercase tracking-wider">
               {unit.label}
             </div>
           </div>
