@@ -1,82 +1,128 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface Profile {
+interface User {
   id: string;
-  user_id: string;
   email: string;
-  full_name?: string;
-  role: 'admin' | 'investor' | 'user';
-  approval_status: 'pending' | 'approved' | 'rejected';
-  created_at: string;
-  updated_at: string;
+  firstName?: string;
+  lastName?: string;
+  role: 'admin' | 'investor' | 'standard';
+  userType: string;
 }
 
 interface AuthContextType {
-  user: any | null;
-  session: any | null;
-  profile: Profile | null;
-  loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role?: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
+  user: User | null;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Mock auth state - Stack Auth temporarily disabled
-  const stackUser = null;
-  const [profile] = useState<Profile | null>(null);
-  const [loading] = useState(false);
-
-  const signUp = async (email: string, password: string, fullName: string, role: string = 'user') => {
-    try {
-      // Redirect to StackFrame signup
-      window.location.href = '/handler/signup';
-      return { error: null };
-    } catch (error) {
-      return { error };
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      // Redirect to StackFrame signin
-      window.location.href = '/handler/signin';
-      return { error: null };
-    } catch (error) {
-      return { error };
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      // Mock sign out - Stack Auth temporarily disabled
-      return { error: null };
-    } catch (error) {
-      return { error };
-    }
-  };
-
-  return (
-    <AuthContext.Provider value={{
-      user: stackUser,
-      session: stackUser ? { user: stackUser } : null,
-      profile,
-      loading,
-      signUp,
-      signIn,
-      signOut
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch('/.netlify/functions/auth-me', {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user) {
+          setUser({
+            id: data.user.id.toString(),
+            email: data.user.email,
+            firstName: data.user.firstName,
+            lastName: data.user.lastName,
+            role: data.user.role as 'admin' | 'investor' | 'standard',
+            userType: data.user.userType
+          });
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/.netlify/functions/auth-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          setUser({
+            id: data.data.id.toString(),
+            email: data.data.email,
+            firstName: data.data.firstName,
+            lastName: data.data.lastName,
+            role: data.data.role as 'admin' | 'investor' | 'standard',
+            userType: data.data.userType
+          });
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Login failed:', error);
+      return false;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await fetch('/.netlify/functions/auth-logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      navigate('/auth');
+    }
+  };
+
+  const value = {
+    user,
+    login,
+    logout,
+    isLoading
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

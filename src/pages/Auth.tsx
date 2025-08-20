@@ -15,7 +15,7 @@ import CinematicEarth from '@/components/CinematicEarth';
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { signUp, signIn, user, loading } = useAuth();
+  const { login, user, isLoading: authLoading } = useAuth();
   
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,20 +33,20 @@ export default function Auth() {
   });
 
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !authLoading) {
       navigate('/dashboard');
     }
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    const { error } = await signIn(signInForm.email, signInForm.password);
+    const success = await login(signInForm.email, signInForm.password);
     
-    if (error) {
-      setError(error.message);
+    if (!success) {
+      setError('Invalid email or password');
     }
     
     setIsLoading(false);
@@ -70,26 +70,42 @@ export default function Auth() {
       return;
     }
 
-    const { error } = await signUp(
-      signUpForm.email,
-      signUpForm.password,
-      signUpForm.fullName,
-      signUpForm.role
-    );
-    
-    if (error) {
-      setError(error.message);
-    } else {
-      setMessage('Account created successfully! Please check your email to verify your account.');
-      if (signUpForm.role === 'investor') {
-        setMessage('Account created successfully! Your investor access is pending admin approval. Please check your email to verify your account.');
+    try {
+      const response = await fetch('/.netlify/functions/auth-signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: signUpForm.email,
+          password: signUpForm.password,
+          fullName: signUpForm.fullName,
+          role: signUpForm.role
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setMessage('Account created successfully! Please check your email to verify your account.');
+          if (signUpForm.role === 'investor') {
+            setMessage('Account created successfully! Your investor access is pending admin approval. Please check your email to verify your account.');
+          }
+        } else {
+          setError(data.error || 'Failed to create account');
+        }
+      } else {
+        setError('Failed to create account');
       }
+    } catch (error) {
+      setError('Network error. Please try again.');
     }
     
     setIsLoading(false);
   };
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

@@ -1,6 +1,9 @@
 import { neon } from '@neondatabase/serverless';
 
-export const sql = neon(process.env.DATABASE_URL!);
+const neonConnectionString = process.env.DATABASE_URL || 
+  process.env.NEON_DATABASE_URL || 
+  `postgresql://neondb_owner:npg_ENQYfp57iyKU@ep-icy-breeze-ae05c0wt-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require`;
+export const sql = neon(neonConnectionString);
 
 export const isAdminEmail = (email: string) => {
   const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());

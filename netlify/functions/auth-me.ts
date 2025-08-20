@@ -1,29 +1,51 @@
 import type { Handler } from '@netlify/functions';
 import { json } from './_db';
-import { requireAuth } from './_stack-auth';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
-    return json(200, {});
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Cookie',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS'
+      }
+    };
+  }
+
+  if (event.httpMethod !== 'GET') {
+    return json(405, { error: 'Method not allowed' });
   }
 
   try {
-    const { stackUser, dbUser } = await requireAuth(event.headers.authorization);
+    const { authUtils } = await import('../../src/lib/auth');
     
-    return json(200, { 
-      user: {
-        id: dbUser.id,
-        stackUserId: stackUser.id,
-        email: dbUser.email,
-        firstName: dbUser.first_name,
-        lastName: dbUser.last_name,
-        role: dbUser.role,
-        isVerified: dbUser.is_verified,
-        displayName: stackUser.displayName,
-        profileImageUrl: stackUser.profileImageUrl
-      }
+    const user = authUtils.getUserFromRequest(event.headers);
+    
+    if (!user) {
+      return json(401, {
+        user: null,
+        message: 'Not authenticated'
+      });
+    }
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      },
+      body: JSON.stringify({
+        user,
+        message: 'Authenticated'
+      })
+    };
+  } catch (error) {
+    console.error('Auth validation error:', error);
+    return json(500, {
+      user: null,
+      error: error instanceof Error ? error.message : 'Authentication validation failed'
     });
-  } catch (e) { 
-    return json(401, { error: 'authentication required' }); 
   }
 };

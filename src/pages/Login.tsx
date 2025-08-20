@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -36,7 +38,7 @@ export default function Login() {
       if (response.ok) {
         toast.success('Login successful!');
         setTimeout(() => {
-          window.location.href = '/access';
+          navigate('/auth');
         }, 1000);
       } else {
         toast.error(data.error || 'Invalid email or password');
@@ -53,7 +55,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <Button
           variant="ghost"
-          onClick={() => window.location.href = '/access'}
+          onClick={() => navigate('/auth')}
           className="text-white/70 hover:text-white mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />

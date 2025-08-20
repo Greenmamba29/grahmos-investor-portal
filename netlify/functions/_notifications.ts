@@ -4,7 +4,7 @@
 interface NotificationData {
   type: 'investor_application' | 'user_signup' | 'admin_action';
   email: string;
-  data: any;
+  data: Record<string, unknown>;
 }
 
 export async function sendAdminNotification(notification: NotificationData) {

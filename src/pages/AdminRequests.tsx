@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +28,7 @@ interface Application {
 }
 
 export default function AdminRequests() {
+  const navigate = useNavigate();
   // Mock user - Stack Auth temporarily disabled
   const stackUser = null;
   const [user] = useState<User | null>(null);
@@ -101,7 +103,7 @@ export default function AdminRequests() {
       <div className="max-w-6xl mx-auto">
         <Button
           variant="ghost"
-          onClick={() => window.location.href = '/access'}
+          onClick={() => navigate('/auth')}
           className="text-white/70 hover:text-white mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />

@@ -8,8 +8,8 @@ interface StackAuthUser {
   displayName: string | null;
   profileImageUrl: string | null;
   signedUpAtMillis: number;
-  clientMetadata: Record<string, any>;
-  serverMetadata: Record<string, any>;
+  clientMetadata: Record<string, unknown>;
+  serverMetadata: Record<string, unknown>;
 }
 
 interface StackAuthPayload {
@@ -30,12 +30,12 @@ export async function validateStackAuthToken(authHeader: string | undefined): Pr
   }
 
   const token = authHeader.substring(7);
-  
+
   try {
     // For now, decode the JWT without verification
     // In production, you should verify with Stack Auth's public key
     const decoded = jwt.decode(token) as StackAuthPayload;
-    
+
     if (!decoded || !decoded.sub) {
       console.error('Invalid JWT token structure');
       return null;
@@ -59,18 +59,30 @@ export async function validateStackAuthToken(authHeader: string | undefined): Pr
   }
 }
 
-export async function ensureUserInDatabase(stackUser: StackAuthUser): Promise<any> {
+interface DatabaseUser {
+  id: string;
+  stack_user_id: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  role: string;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function ensureUserInDatabase(stackUser: StackAuthUser): Promise<DatabaseUser> {
   if (!stackUser.primaryEmail) {
     throw new Error('User must have an email');
   }
 
   const role = isAdminEmail(stackUser.primaryEmail) ? 'admin' : 'standard';
-  
+
   // First, check if user already exists by stack_user_id
   const existingUser = await sql`
     SELECT * FROM users WHERE stack_user_id = ${stackUser.id}
   `;
-  
+
   if (existingUser.length > 0) {
     return existingUser[0];
   }
@@ -79,16 +91,16 @@ export async function ensureUserInDatabase(stackUser: StackAuthUser): Promise<an
   const rows = await sql`
     INSERT INTO users (stack_user_id, email, first_name, last_name, role, is_verified)
     VALUES (
-      ${stackUser.id}, 
-      ${stackUser.primaryEmail}, 
-      ${stackUser.displayName ? stackUser.displayName.split(' ')[0] : null}, 
-      ${stackUser.displayName ? stackUser.displayName.split(' ').slice(1).join(' ') || null : null}, 
-      ${role}, 
+      ${stackUser.id},
+      ${stackUser.primaryEmail},
+      ${stackUser.displayName ? stackUser.displayName.split(' ')[0] : null},
+      ${stackUser.displayName ? stackUser.displayName.split(' ').slice(1).join(' ') || null : null},
+      ${role},
       ${stackUser.primaryEmailVerified}
     )
-    ON CONFLICT (email) DO UPDATE SET 
+    ON CONFLICT (email) DO UPDATE SET
       stack_user_id = EXCLUDED.stack_user_id,
-      first_name = EXCLUDED.first_name, 
+      first_name = EXCLUDED.first_name,
       last_name = EXCLUDED.last_name,
       role = EXCLUDED.role,
       is_verified = EXCLUDED.is_verified,
@@ -99,7 +111,7 @@ export async function ensureUserInDatabase(stackUser: StackAuthUser): Promise<an
   return rows[0];
 }
 
-export async function requireAuth(authHeader: string | undefined): Promise<{ stackUser: StackAuthUser; dbUser: any }> {
+export async function requireAuth(authHeader: string | undefined): Promise<{ stackUser: StackAuthUser; dbUser: DatabaseUser }> {
   const stackUser = await validateStackAuthToken(authHeader);
   if (!stackUser) {
     throw new Error('Authentication required');

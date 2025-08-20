@@ -36,13 +36,13 @@ export const apiRequest = {
   get: (url: string, accessToken?: string) => 
     makeAuthenticatedRequest(url, { method: 'GET' }, accessToken),
   
-  post: (url: string, data: any, accessToken?: string) => 
+  post: (url: string, data: Record<string, unknown>, accessToken?: string) => 
     makeAuthenticatedRequest(url, {
       method: 'POST',
       body: JSON.stringify(data),
     }, accessToken),
   
-  put: (url: string, data: any, accessToken?: string) => 
+  put: (url: string, data: Record<string, unknown>, accessToken?: string) => 
     makeAuthenticatedRequest(url, {
       method: 'PUT',
       body: JSON.stringify(data),

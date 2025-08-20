@@ -9,8 +9,17 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { api, validateEmail, generateSlug } from '@/lib/api';
 
+interface UserData {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName?: string;
+  userType: string;
+  slug: string;
+}
+
 interface EnhancedLoginProps {
-  onAuthSuccess?: (userData: any) => void;
+  onAuthSuccess?: (userData: UserData) => void;
 }
 
 const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
@@ -112,14 +121,23 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
       }
 
       if (mode === 'signup') {
-        // Create user account in Neon database
-        const result = await api.registerUser({
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          password: formData.password,
-          userType: 'user'
+        // Create user account via Netlify function
+        const response = await fetch('/.netlify/functions/auth-signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: formData.email,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            password: formData.password,
+            userType: 'user'
+          })
         });
+
+        const result = await response.json();
 
         if (result.success) {
           setSuccessState('signup');
@@ -131,13 +149,21 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
             }
           );
           
-          // Smooth transition to login tab
-          setIsTransitioning(true);
+          if (onAuthSuccess && result.data) {
+            const userData = {
+              id: result.data.id.toString(),
+              email: result.data.email,
+              firstName: result.data.firstName || 'User',
+              lastName: result.data.lastName,
+              userType: result.data.userType,
+              slug: generateSlug(result.data.email)
+            };
+            onAuthSuccess(userData);
+          }
+          
+          // Navigate to portal
           setTimeout(() => {
-            setActiveTab('login');
-            setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
-            setIsTransitioning(false);
-            setSuccessState(null);
+            navigate('/portal');
           }, 1000);
         } else {
           toast.error('Account creation failed', {
@@ -149,12 +175,24 @@ const EnhancedLogin = ({ onAuthSuccess }: EnhancedLoginProps) => {
       }
 
       if (mode === 'login') {
-        // Login user
-        const result = await api.loginUser(formData.email, formData.password);
+        // Login user via Netlify function
+        const response = await fetch('/.netlify/functions/auth-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
+        });
+
+        const result = await response.json();
         
         if (result.success && result.data) {
           const userData = {
-            id: result.data.id,
+            id: result.data.id.toString(),
             email: result.data.email,
             firstName: result.data.firstName || 'User',
             lastName: result.data.lastName,

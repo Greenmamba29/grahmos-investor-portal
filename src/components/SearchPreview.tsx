@@ -1,13 +1,13 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, Sparkles, Zap, Globe, Brain } from 'lucide-react';
 
 const SearchPreview = () => {
   const [searchText, setSearchText] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentQueryIndex, setCurrentQueryIndex] = useState(0);
-  
-  const demoQueries = [
+
+  const demoQueries = useMemo(() => [
     'future of artificial intelligence',
     'sustainable energy solutions',
     'quantum computing breakthroughs',
@@ -16,7 +16,7 @@ const SearchPreview = () => {
     'climate change innovations',
     'blockchain revolution',
     'autonomous vehicles'
-  ];
+  ], []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,7 +34,7 @@ const SearchPreview = () => {
   // Set initial text
   useEffect(() => {
     setSearchText(demoQueries[0]);
-  }, []);
+  }, [demoQueries]);
 
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -43,7 +43,7 @@ const SearchPreview = () => {
         {/* Background glow effects */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-cyan-500/5 to-purple-500/5 rounded-3xl"></div>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500"></div>
-        
+
         {/* Search interface */}
         <div className="relative z-10">
           <div className="flex items-center space-x-4">
@@ -59,7 +59,7 @@ const SearchPreview = () => {
                 <div className="absolute top-1/2 left-0 w-1 h-1 bg-purple-400 rounded-full animate-float-slow"></div>
               </div>
             </div>
-            
+
             <div className="flex-1">
               <div className="text-2xl md:text-3xl font-light text-white/90 min-h-[3rem] flex items-center">
                 <span className={`transition-all duration-500 ${isAnimating ? 'opacity-0 transform translate-y-2 scale-95' : 'opacity-100 transform translate-y-0 scale-100'}`}>
@@ -69,7 +69,7 @@ const SearchPreview = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Enhanced animated results preview */}
           <div className="mt-8 space-y-4">
             {[1, 2, 3].map((i) => (
@@ -103,7 +103,7 @@ const SearchPreview = () => {
         <div className="absolute bottom-4 left-4 w-2 h-2 bg-cyan-400/30 rounded-full animate-float-medium"></div>
         <div className="absolute top-1/2 right-8 w-1 h-1 bg-purple-400/40 rounded-full animate-float-slow"></div>
       </div>
-      
+
       {/* Enhanced subtitle */}
       <div className="text-center mt-8">
         <p className="text-white/70 text-lg mb-2">
