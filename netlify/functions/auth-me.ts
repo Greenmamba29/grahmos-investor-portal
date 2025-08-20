@@ -1,6 +1,5 @@
 import type { Handler } from '@netlify/functions';
 import { json } from './_db';
-import { authUtils } from '../../src/lib/auth';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -19,6 +18,8 @@ export const handler: Handler = async (event) => {
   }
 
   try {
+    const { authUtils } = await import('../../src/lib/auth');
+    
     const user = authUtils.getUserFromRequest(event.headers);
     
     if (!user) {
@@ -44,7 +45,7 @@ export const handler: Handler = async (event) => {
     console.error('Auth validation error:', error);
     return json(500, {
       user: null,
-      error: 'Authentication validation failed'
+      error: error instanceof Error ? error.message : 'Authentication validation failed'
     });
   }
 };
