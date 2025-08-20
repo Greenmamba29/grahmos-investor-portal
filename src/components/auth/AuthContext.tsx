@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Logout error:', error);
     } finally {
       setUser(null);
-      navigate('/handler/signup');
+      navigate('/auth');
     }
   };
 
