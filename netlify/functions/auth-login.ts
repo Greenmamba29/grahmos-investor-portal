@@ -1,7 +1,5 @@
 import type { Handler } from '@netlify/functions';
 import { json } from './_db';
-import { dbOperations } from '../../src/lib/schema';
-import { authUtils } from '../../src/lib/auth';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -20,6 +18,9 @@ export const handler: Handler = async (event) => {
   }
 
   try {
+    const { dbOperations } = await import('../../src/lib/schema');
+    const { authUtils } = await import('../../src/lib/auth');
+    
     const { email, password } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
@@ -77,7 +78,7 @@ export const handler: Handler = async (event) => {
     console.error('Login error:', error);
     return json(500, {
       error: 'Login failed',
-      details: 'Internal server error'
+      details: error instanceof Error ? error.message : 'Internal server error'
     });
   }
 };
