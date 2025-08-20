@@ -1,7 +1,8 @@
 import { neon } from '@neondatabase/serverless';
 
 // Use the same database connection pattern as Netlify functions
-const sql = neon(process.env.DATABASE_URL!);
+const databaseUrl = process.env.DATABASE_URL?.replace('/grahmos_investor', '/neondb') || process.env.DATABASE_URL!;
+const sql = neon(databaseUrl);
 
 // Database schema creation
 export const createTables = async () => {

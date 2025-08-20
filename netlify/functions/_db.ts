@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 
-export const sql = neon(process.env.DATABASE_URL!);
+const databaseUrl = process.env.DATABASE_URL?.replace('/grahmos_investor', '/neondb') || process.env.DATABASE_URL!;
+export const sql = neon(databaseUrl);
 
 export const isAdminEmail = (email: string) => {
   const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());
