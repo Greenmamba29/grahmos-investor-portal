@@ -1,33 +1,13 @@
-import { StackClientApp } from "@stackframe/react";
+// Temporarily disable Stack Auth to avoid React conflicts
+// The issue is that @stackframe/stack includes Next.js which conflicts with Vite's React setup
 
-// Debug environment variables
-console.log('Stack Auth Environment Check:', {
-  VITE_STACK_PROJECT_ID: import.meta.env.VITE_STACK_PROJECT_ID ? 'Set' : 'Missing',
-  VITE_STACK_PUBLISHABLE_CLIENT_KEY: import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY ? 'Set' : 'Missing',
-  NEXT_PUBLIC_STACK_PROJECT_ID: (globalThis as any).NEXT_PUBLIC_STACK_PROJECT_ID || 'Not set',
-  MODE: import.meta.env.MODE,
-  DEV: import.meta.env.DEV
-});
+console.log('Stack Auth temporarily disabled - using mock client');
 
-const projectId = import.meta.env.VITE_STACK_PROJECT_ID;
-const publishableClientKey = import.meta.env.VITE_STACK_PUBLISHABLE_CLIENT_KEY;
-
-if (!projectId || !publishableClientKey) {
-  console.error('Stack Auth configuration error:', {
-    projectId: projectId ? 'Set' : 'Missing',
-    publishableClientKey: publishableClientKey ? 'Set' : 'Missing'
-  });
-}
-
-export const stackClientApp = new StackClientApp({
-  projectId,
-  publishableClientKey,
-  tokenStore: "cookie",
-  urls: {
-    signIn: "/handler/signin",
-    signUp: "/handler/signup",
-    afterSignIn: "/dashboard",
-    afterSignUp: "/dashboard",
-    afterSignOut: "/",
-  }
-});
+// Mock Stack Client App for now
+export const stackClientApp = {
+  // Mock implementation to prevent errors
+  signIn: () => Promise.resolve(null),
+  signOut: () => Promise.resolve(null),
+  getUser: () => null,
+  // Add other methods as needed
+};

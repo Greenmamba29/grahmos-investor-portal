@@ -3,7 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { StackHandler, StackProvider, StackTheme } from "@stackframe/react";
+// Temporarily disabled Stack Auth imports to fix React conflicts
+// import { StackHandler, StackProvider, StackTheme } from "@stackframe/react";
 import { Suspense } from "react";
 import { stackClientApp } from "./stack";
 import { Layout } from "@/components/Layout";
@@ -31,14 +32,20 @@ import EnvTest from "./pages/EnvTest";
 
 const queryClient = new QueryClient();
 
+// Temporarily disabled Stack Auth handler
 function HandlerRoutes() {
   const location = useLocation();
   
   // Debug: Log the handler path being accessed
-  console.log('Stack Auth Handler accessing path:', location.pathname);
+  console.log('Stack Auth Handler accessing path (disabled):', location.pathname);
   
   return (
-    <StackHandler app={stackClientApp} location={location.pathname} fullPage />
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4">Authentication Handler</h1>
+        <p className="text-muted-foreground">Stack Auth temporarily disabled</p>
+      </div>
+    </div>
   );
 }
 
@@ -46,13 +53,11 @@ const App = () => (
   <ErrorBoundary>
     <Suspense fallback={"Loading..."}>
       <BrowserRouter>
-        <StackProvider app={stackClientApp}>
-          <StackTheme>
-            <QueryClientProvider client={queryClient}>
-              <TooltipProvider>
-                <AuthProvider>
-                  <Toaster />
-                  <Sonner />
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <AuthProvider>
+              <Toaster />
+              <Sonner />
                 <Routes>
                 {/* Stack Auth Handler */}
                 <Route path="/handler/*" element={<HandlerRoutes />} />
@@ -93,13 +98,11 @@ const App = () => (
                 {/* 404 with Layout */}
                 <Route path="*" element={<Layout><NotFound /></Layout>} />
               </Routes>
-              </AuthProvider>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </StackTheme>
-      </StackProvider>
-    </BrowserRouter>
-  </Suspense>
+            </AuthProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </Suspense>
   </ErrorBoundary>
 );
 
