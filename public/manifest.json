@@ -1,0 +1,23 @@
+{
+  "name": "GrahmOS Connect - Advanced Investor Portal",
+  "short_name": "GrahmOS Connect",
+  "description": "The future of emergency communication and investor relations",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1a1a2e",
+  "background_color": "#0f0f1a",
+  "orientation": "portrait-primary"
+}
