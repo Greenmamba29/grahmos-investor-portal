@@ -64,8 +64,8 @@ export default function Auth() {
       return;
     }
 
-    if (signUpForm.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (signUpForm.password.length < 8) {
+      setError('Password must be at least 8 characters');
       setIsLoading(false);
       return;
     }
@@ -85,18 +85,34 @@ export default function Auth() {
         })
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
-        const data = await response.json();
         if (data.success) {
           setMessage('Account created successfully! Please check your email to verify your account.');
           if (signUpForm.role === 'investor') {
             setMessage('Account created successfully! Your investor access is pending admin approval. Please check your email to verify your account.');
           }
+          // Clear the form on successful signup
+          setSignUpForm({
+            email: '',
+            password: '',
+            confirmPassword: '',
+            fullName: '',
+            role: 'user'
+          });
         } else {
           setError(data.error || 'Failed to create account');
         }
       } else {
-        setError('Failed to create account');
+        // Handle specific HTTP error codes
+        if (response.status === 409) {
+          setError('This email is already registered. Please use a different email or try signing in.');
+        } else if (response.status === 400) {
+          setError(data.error || data.details || 'Invalid signup information');
+        } else {
+          setError(data.error || data.details || 'Failed to create account');
+        }
       }
     } catch (error) {
       setError('Network error. Please try again.');
@@ -252,7 +268,7 @@ export default function Auth() {
                         value={signUpForm.password}
                         onChange={(e) => setSignUpForm({ ...signUpForm, password: e.target.value })}
                         required
-                        minLength={6}
+                        minLength={8}
                         className="backdrop-glass border-border/50"
                       />
                     </div>

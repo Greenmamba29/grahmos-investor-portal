@@ -10,6 +10,7 @@ import { stackClientApp } from "./stack";
 import { Layout } from "@/components/Layout";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Overview from "./pages/Overview";
 import MarketAnalysis from "./pages/MarketAnalysis";
 import Product from "./pages/Product";
@@ -26,6 +27,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import InvestorApply from "./pages/InvestorApply";
 import AdminRequests from "./pages/AdminRequests";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -71,18 +73,52 @@ const App = () => (
                 {/* Auth routes (no layout) */}
                 <Route path="/auth" element={<Auth />} />
                 
-                {/* Protected routes (no layout) */}
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/investor" element={<InvestorPortal />} />
-                <Route path="/investor-portal" element={<InvestorPortal />} />
+                {/* Protected routes with role-based access control */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/investor" element={
+                  <ProtectedRoute requiredRoles={['investor', 'admin']}>
+                    <InvestorPortal />
+                  </ProtectedRoute>
+                } />
+                <Route path="/investor-portal" element={
+                  <ProtectedRoute requiredRoles={['investor', 'admin']}>
+                    <InvestorPortal />
+                  </ProtectedRoute>
+                } />
                 
                 {/* Legacy routes for backward compatibility */}
                 <Route path="/portal/:slug" element={<Portal />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/investor/apply" element={<InvestorApply />} />
-                <Route path="/investor/:slug" element={<InvestorPortal />} />
-                <Route path="/admin/requests" element={<AdminRequests />} />
+                <Route path="/investor/apply" element={
+                  <ProtectedRoute>
+                    <InvestorApply />
+                  </ProtectedRoute>
+                } />
+                <Route path="/investor/:slug" element={
+                  <ProtectedRoute requiredRoles={['investor', 'admin']}>
+                    <InvestorPortal />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/dashboard" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/requests" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminRequests />
+                  </ProtectedRoute>
+                } />
                 <Route path="/test-portal" element={<TestPortal />} />
                 <Route path="/demo" element={<TestPortal />} />
                 
