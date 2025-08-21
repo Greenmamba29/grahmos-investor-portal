@@ -19,6 +19,8 @@ export const createTables = async () => {
         password_hash VARCHAR(255),
         is_verified BOOLEAN DEFAULT false,
         verification_token VARCHAR(255),
+        reset_token VARCHAR(255),
+        reset_token_expires TIMESTAMPTZ,
         role VARCHAR(20) NOT NULL DEFAULT 'standard',
         user_type VARCHAR(50) DEFAULT 'user',
         created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -29,6 +31,14 @@ export const createTables = async () => {
     // Add role column if it doesn't exist (migration)
     await sql`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'standard'
+    `;
+    
+    // Add password reset columns if they don't exist (migration)
+    await sql`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255)
+    `;
+    await sql`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMPTZ
     `;
 
     // Create newsletter_signups table
@@ -265,6 +275,46 @@ export const dbOperations = {
       SELECT id, email, first_name, last_name, signup_source, is_confirmed, created_at
       FROM newsletter_signups 
       WHERE email = ${email}
+    `;
+    return result[0];
+  },
+
+  // Password reset operations
+  async storePasswordResetToken(userId: number, resetToken: string, expiresAt: Date) {
+    const result = await sql`
+      UPDATE users 
+      SET reset_token = ${resetToken}, reset_token_expires = ${expiresAt}, updated_at = NOW()
+      WHERE id = ${userId}
+      RETURNING id, email
+    `;
+    return result[0];
+  },
+
+  async getUserByResetToken(resetToken: string) {
+    const result = await sql`
+      SELECT id, email, first_name, last_name, reset_token_expires
+      FROM users 
+      WHERE reset_token = ${resetToken} AND reset_token_expires > NOW()
+    `;
+    return result[0];
+  },
+
+  async updateUserPassword(userId: number, passwordHash: string) {
+    const result = await sql`
+      UPDATE users 
+      SET password_hash = ${passwordHash}, updated_at = NOW()
+      WHERE id = ${userId}
+      RETURNING id, email
+    `;
+    return result[0];
+  },
+
+  async clearPasswordResetToken(userId: number) {
+    const result = await sql`
+      UPDATE users 
+      SET reset_token = NULL, reset_token_expires = NULL, updated_at = NOW()
+      WHERE id = ${userId}
+      RETURNING id, email
     `;
     return result[0];
   },

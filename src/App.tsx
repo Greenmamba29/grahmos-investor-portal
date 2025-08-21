@@ -28,6 +28,7 @@ import Login from "./pages/Login";
 import InvestorApply from "./pages/InvestorApply";
 import AdminRequests from "./pages/AdminRequests";
 import AdminDashboard from "./pages/AdminDashboard";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const App = () => (
                 
                 {/* Auth routes (no layout) */}
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
                 
                 {/* Protected routes with role-based access control */}
                 <Route path="/dashboard" element={

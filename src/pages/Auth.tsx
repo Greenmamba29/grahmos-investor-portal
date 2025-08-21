@@ -31,6 +31,7 @@ export default function Auth() {
     fullName: '',
     role: 'user'
   });
+  const [forgotPasswordForm, setForgotPasswordForm] = useState({ email: '' });
 
   useEffect(() => {
     if (user && !authLoading) {
@@ -113,6 +114,45 @@ export default function Auth() {
         } else {
           setError(data.error || data.details || 'Failed to create account');
         }
+      }
+    } catch (error) {
+      setError('Network error. Please try again.');
+    }
+    
+    setIsLoading(false);
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setMessage('');
+
+    try {
+      const response = await fetch('/.netlify/functions/auth-forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: forgotPasswordForm.email
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessage(data.message || 'If an account with this email exists, you will receive a password reset link shortly.');
+        // Clear the form
+        setForgotPasswordForm({ email: '' });
+        
+        // In development, show the reset URL if available
+        if (data.resetUrl && process.env.NODE_ENV === 'development') {
+          console.log('Reset URL:', data.resetUrl);
+          setMessage(data.message + ' (Check console for reset link in development)');
+        }
+      } else {
+        setError(data.error || data.details || 'Failed to process password reset request');
       }
     } catch (error) {
       setError('Network error. Please try again.');
@@ -211,6 +251,15 @@ export default function Auth() {
                       ) : null}
                       Access Portal
                     </Button>
+                    <div className="text-center mt-4">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('forgot')}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Forgot your password?
+                      </button>
+                    </div>
                   </form>
                 </TabsContent>
 
@@ -293,6 +342,48 @@ export default function Auth() {
                       ) : null}
                       Create Account
                     </Button>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="forgot" className="space-y-4">
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div className="text-center mb-4">
+                      <h3 className="text-lg font-semibold text-gradient">Reset Your Password</h3>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Enter your email address and we'll send you a link to reset your password.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="forgot-email">Email</Label>
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={forgotPasswordForm.email}
+                        onChange={(e) => setForgotPasswordForm({ email: e.target.value })}
+                        required
+                        className="backdrop-glass border-border/50"
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full glow" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : null}
+                      Send Reset Link
+                    </Button>
+                    <div className="text-center mt-4">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('signin')}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Back to Sign In
+                      </button>
+                    </div>
                   </form>
                 </TabsContent>
               </Tabs>
