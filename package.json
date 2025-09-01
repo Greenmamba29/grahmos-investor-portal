@@ -8,7 +8,13 @@
     "type": "git",
     "url": "https://github.com/Greenmamba29/grahmos-investor-portal"
   },
-  "keywords": ["grahmos", "investor-portal", "emergency-communication", "react", "typescript"],
+  "keywords": [
+    "grahmos",
+    "investor-portal",
+    "emergency-communication",
+    "react",
+    "typescript"
+  ],
   "author": "GrahmOS Team",
   "type": "module",
   "scripts": {
@@ -23,11 +29,10 @@
     "deploy": "node scripts/deploy.js",
     "deploy:safe": "npm run validate-env && npm run build && netlify deploy --prod",
     "test:db": "node test-database-connection.js",
-    "env:sync": "node -e \"import('./scripts/deploy.js').then(m => m.syncEnvironmentVariables())\"" 
+    "env:sync": "node -e \"import('./scripts/deploy.js').then(m => m.syncEnvironmentVariables())\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
-    "@supabase/supabase-js": "^2.55.0",
     "@neondatabase/serverless": "^1.0.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -58,8 +63,10 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
+    "@sendgrid/mail": "^8.1.5",
     "@stackframe/react": "^2.8.30",
     "@stackframe/stack": "^2.8.30",
+    "@supabase/supabase-js": "^2.55.0",
     "@tanstack/react-query": "^5.56.2",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",

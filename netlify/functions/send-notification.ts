@@ -119,6 +119,53 @@ Welcome to the GrahmOS Connect investor community!
     `
   }),
 
+  investorRejection: (userName: string, userEmail: string) => ({
+    subject: '📋 Investor Application Update - GrahmOS Connect',
+    htmlContent: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #ffffff; border-radius: 12px; overflow: hidden;">
+        <div style="background: linear-gradient(45deg, #0f3460, #16213e); padding: 40px 30px; text-align: center;">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 700;">📋 Application Update</h1>
+          <p style="margin: 10px 0 0; font-size: 16px; opacity: 0.9;">GrahmOS Connect Investor Portal</p>
+        </div>
+        
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #ffaa44; margin: 0 0 20px; font-size: 22px;">Thank you ${userName}</h2>
+          
+          <p style="font-size: 16px; line-height: 1.6; margin: 0 0 25px;">
+            Thank you for your interest in becoming an investor with GrahmOS Connect. After careful consideration, we are unable to approve your investor application at this time.
+          </p>
+          
+          <div style="background: rgba(255, 170, 68, 0.1); border: 1px solid rgba(255, 170, 68, 0.3); border-radius: 8px; padding: 20px; margin: 25px 0;">
+            <p style="margin: 0; font-size: 14px; line-height: 1.6;">
+              This decision does not reflect on your qualifications, and you're welcome to reapply in the future. We encourage you to continue following our progress as a standard user.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="https://grahmos.info/dashboard" style="display: inline-block; background: linear-gradient(45deg, #00d4ff, #0099cc); color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);">
+              Continue to Dashboard
+            </a>
+          </div>
+          
+          <p style="font-size: 14px; line-height: 1.6; margin: 25px 0 0; opacity: 0.8;">
+            If you have any questions, please feel free to contact our support team.
+          </p>
+        </div>
+      </div>
+    `,
+    textContent: `
+Thank you ${userName},
+
+Thank you for your interest in becoming an investor with GrahmOS Connect. After careful consideration, we are unable to approve your investor application at this time.
+
+This decision does not reflect on your qualifications, and you're welcome to reapply in the future.
+
+Continue to your dashboard: https://grahmos.info/dashboard
+
+If you have any questions, please contact our support team.
+    `
+  }),
+
   adminAlert: (userName: string, userEmail: string, applicationType: string) => ({
     subject: `🔔 New ${applicationType} Application - Admin Review Required`,
     htmlContent: `
@@ -155,38 +202,73 @@ Review at: https://grahmos.info/admin/requests
   })
 };
 
-// Mock email service (replace with real email service like SendGrid, AWS SES, etc.)
+// Email service implementation with SendGrid
 async function sendEmail(notification: EmailNotification): Promise<boolean> {
   try {
-    // In development, log email instead of sending
-    if (process.env.NODE_ENV === 'development' || !process.env.EMAIL_SERVICE_ENABLED) {
+    // Always log in development for debugging
+    if (process.env.NODE_ENV === 'development') {
       console.log('📧 EMAIL NOTIFICATION (Development Mode):');
       console.log('To:', notification.to);
       console.log('Subject:', notification.subject);
       console.log('Type:', notification.type);
-      console.log('Content:', notification.textContent);
       console.log('---');
-      return true;
     }
 
-    // Example implementation with SendGrid (uncomment and configure)
-    /*
-    const sgMail = require('@sendgrid/mail');
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    // Try to send real email if configured
+    if (process.env.SENDGRID_API_KEY) {
+      try {
+        const sgMail = await import('@sendgrid/mail');
+        sgMail.default.setApiKey(process.env.SENDGRID_API_KEY);
 
-    const msg = {
-      to: notification.to,
-      from: process.env.FROM_EMAIL || 'noreply@grahmos.info',
-      subject: notification.subject,
-      text: notification.textContent,
-      html: notification.htmlContent,
-    };
+        const msg = {
+          to: notification.to,
+          from: {
+            email: process.env.FROM_EMAIL || 'noreply@grahmos.info',
+            name: 'GrahmOS Connect'
+          },
+          subject: notification.subject,
+          text: notification.textContent,
+          html: notification.htmlContent,
+        };
 
-    await sgMail.send(msg);
-    */
+        await sgMail.default.send(msg);
+        console.log(`✅ Email sent successfully to ${notification.to}`);
+        return true;
+      } catch (sgError) {
+        console.error('❌ SendGrid error:', sgError);
+        // Fall through to alternative methods
+      }
+    }
 
-    // For now, just log the email notification
-    console.log(`📧 Email sent to ${notification.to}: ${notification.subject}`);
+    // Alternative: Simple SMTP or webhook notification
+    if (process.env.WEBHOOK_URL) {
+      try {
+        const webhookResponse = await fetch(process.env.WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.WEBHOOK_TOKEN || ''}`
+          },
+          body: JSON.stringify({
+            to: notification.to,
+            subject: notification.subject,
+            content: notification.textContent,
+            html: notification.htmlContent,
+            type: notification.type
+          })
+        });
+        
+        if (webhookResponse.ok) {
+          console.log(`✅ Webhook notification sent to ${notification.to}`);
+          return true;
+        }
+      } catch (webhookError) {
+        console.error('❌ Webhook error:', webhookError);
+      }
+    }
+
+    // If no email service is configured, just log (for now)
+    console.log(`📧 Email notification logged (no service configured): ${notification.subject} -> ${notification.to}`);
     return true;
   } catch (error) {
     console.error('❌ Email sending failed:', error);
@@ -214,6 +296,9 @@ export const handler: Handler = async (event) => {
         break;
       case 'investor_approval':
         emailData = emailTemplates.investorApproval(userName || 'Investor', userEmail);
+        break;
+      case 'investor_rejection':
+        emailData = emailTemplates.investorRejection(userName || 'User', userEmail);
         break;
       case 'admin_alert':
         emailData = emailTemplates.adminAlert(userName || 'User', userEmail, applicationType || 'General');

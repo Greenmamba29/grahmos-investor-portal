@@ -27,16 +27,41 @@ export const handler: Handler = async (event) => {
         created_at = NOW()
       RETURNING id, status`;
       
-    // Send admin notification about new investor application
-    await sendAdminNotification({
-      type: 'investor_application',
-      email: dbUser.email,
-      data: {
-        pitch,
-        accreditation: !!accreditation,
-        applicationId: rows[0].id
+      // Send admin notification about new investor application
+      try {
+        const userName = `${dbUser.first_name || ''} ${dbUser.last_name || ''}`.trim() || dbUser.email.split('@')[0];
+        const adminEmails = (process.env.ADMIN_EMAILS || 'admin@grahmos.info').split(',');
+        
+        for (const adminEmail of adminEmails) {
+          const adminAlertResponse = await fetch(`${process.env.URL || 'https://grahmos.info'}/.netlify/functions/send-notification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'admin_alert',
+              userEmail: adminEmail.trim(),
+              userName: userName,
+              applicationType: 'Investor Application'
+            })
+          });
+          
+          if (!adminAlertResponse.ok) {
+            console.warn('Failed to send admin alert:', await adminAlertResponse.text());
+          }
+        }
+      } catch (emailError) {
+        console.warn('Admin alert email error:', emailError);
       }
-    });
+
+      // Also use the legacy notification system as backup
+      await sendAdminNotification({
+        type: 'investor_application',
+        email: dbUser.email,
+        data: {
+          pitch,
+          accreditation: !!accreditation,
+          applicationId: rows[0].id
+        }
+      });
       
     return json(200, { ok: true, application: rows[0] });
   } catch (e) { 
