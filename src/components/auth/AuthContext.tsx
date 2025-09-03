@@ -1,21 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface User {
-  id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  role: 'admin' | 'investor' | 'standard';
-  userType: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  isLoading: boolean;
-}
+import { errorHandler, AppError } from '@/lib/error-handler';
+import { authApi } from '@/lib/api-client';
+import type { User, AuthContextType } from '@/types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -30,6 +17,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<AppError | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,57 +55,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const response = await fetch('/.netlify/functions/auth-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email, password })
-      });
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: AppError }> => {
+    setError(null);
+    
+    const result = await authApi.login(email, password);
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          setUser({
-            id: data.data.id.toString(),
-            email: data.data.email,
-            firstName: data.data.firstName,
-            lastName: data.data.lastName,
-            role: data.data.role as 'admin' | 'investor' | 'standard',
-            userType: data.data.userType
-          });
-          return true;
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error('Login failed:', error);
-      return false;
+    if (result.error) {
+      setError(result.error);
+      return { success: false, error: result.error };
     }
+
+    if (result.data?.success && result.data?.data) {
+      setUser({
+        id: result.data.data.id.toString(),
+        email: result.data.data.email,
+        firstName: result.data.data.firstName,
+        lastName: result.data.data.lastName,
+        role: result.data.data.role as 'admin' | 'investor' | 'standard',
+        userType: result.data.data.userType
+      });
+      return { success: true };
+    }
+
+    const authError = errorHandler.handleAuthError('Login failed - invalid response', 'User login');
+    setError(authError);
+    return { success: false, error: authError };
   };
 
   const logout = async () => {
     try {
-      await fetch('/.netlify/functions/auth-logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
+      await authApi.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      errorHandler.handleError(error, 'User logout');
     } finally {
       setUser(null);
+      setError(null);
       navigate('/auth');
     }
+  };
+
+  const clearError = () => {
+    setError(null);
   };
 
   const value = {
     user,
     login,
     logout,
-    isLoading
+    isLoading,
+    error,
+    clearError
   };
 
   return (
