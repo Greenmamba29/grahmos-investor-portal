@@ -120,7 +120,7 @@ async function validateDeployment() {
   try {
     // Get site URL
     const status = execSync('netlify status', { encoding: 'utf8' });
-    const urlMatch = status.match(/Project URL:\\s+(https:\\/\\/[^\\s]+)/);
+    const urlMatch = status.match(/Project URL:\s+(https:\/\/[\S]+)/);
     const siteUrl = urlMatch ? urlMatch[1] : 'https://grahmos.info';
     
     console.log(`🌐 Testing site availability: ${siteUrl}`);
