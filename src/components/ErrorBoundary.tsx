@@ -1,10 +1,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { errorHandler, AppError } from '@/lib/error-handler';
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
   errorInfo?: React.ErrorInfo;
+  appError?: AppError;
 }
 
 export class ErrorBoundary extends React.Component<
@@ -21,8 +23,9 @@ export class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    const appError = errorHandler.handleError(error, 'React Error Boundary');
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    this.setState({ error, errorInfo });
+    this.setState({ error, errorInfo, appError });
   }
 
   render() {
@@ -36,8 +39,19 @@ export class ErrorBoundary extends React.Component<
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {this.state.appError && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Error Information:</h3>
+                  <div className="bg-muted p-4 rounded-lg text-sm space-y-2">
+                    <div><strong>Code:</strong> {this.state.appError.code}</div>
+                    <div><strong>Message:</strong> {this.state.appError.message}</div>
+                    <div><strong>Context:</strong> {this.state.appError.context || 'Unknown'}</div>
+                    <div><strong>Timestamp:</strong> {new Date(this.state.appError.timestamp).toLocaleString()}</div>
+                  </div>
+                </div>
+              )}
               <div>
-                <h3 className="text-lg font-semibold mb-2">Error Details:</h3>
+                <h3 className="text-lg font-semibold mb-2">Technical Details:</h3>
                 <pre className="bg-muted p-4 rounded-lg text-sm overflow-auto">
                   {this.state.error?.toString()}
                 </pre>

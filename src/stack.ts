@@ -1,5 +1,5 @@
-// Temporarily disable Stack Auth to avoid React conflicts
-// The issue is that @stackframe/stack includes Next.js which conflicts with Vite's React setup
+// Stack Auth temporarily disabled due to package compatibility issues
+// TODO: Re-enable when @stackframe/stack package issues are resolved
 
 console.log('Stack Auth temporarily disabled - using mock client');
 
@@ -9,5 +9,6 @@ export const stackClientApp = {
   signIn: () => Promise.resolve(null),
   signOut: () => Promise.resolve(null),
   getUser: () => null,
+  signUp: () => Promise.resolve(null),
   // Add other methods as needed
 };
