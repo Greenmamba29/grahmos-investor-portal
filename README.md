@@ -198,3 +198,20 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Developer scripts
+
+- dev: Netlify dev server
+- dev:vite: Vite dev server
+- build: Production build
+- preview: Preview production build locally
+- lint: Lint codebase with ESLint
+- format: Format code with Prettier
+
+## Recent technical changes
+
+- Enabled route-level code splitting via React.lazy in `src/App.tsx`
+- Removed unused large asset `public/earth-network.jpg`
+- Fixed ESLint parsing error in `scripts/deploy.js`
+- Tightened ESLint config for Node/ESM scripts
+- Added `format` script and CI workflow at `.github/workflows/ci.yml`

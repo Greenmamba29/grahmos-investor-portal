@@ -10,8 +10,9 @@ export default tseslint.config(
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2024,
       globals: globals.browser,
+      sourceType: "module",
     },
     plugins: {
       "react-hooks": reactHooks,
@@ -25,5 +26,16 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-unused-vars": "off",
     },
+  },
+  {
+    files: ["**/*.{js,jsx}"]
+    ,languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: "module",
+      globals: globals.node,
+    },
+    rules: {
+      // Keep JS scripts linted but allow modern syntax and emojis
+    }
   }
 );

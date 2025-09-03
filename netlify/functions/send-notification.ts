@@ -6,7 +6,7 @@ interface EmailNotification {
   subject: string;
   htmlContent: string;
   textContent: string;
-  type: 'welcome' | 'approval' | 'rejection' | 'admin_alert';
+  type: 'welcome' | 'investor_approval' | 'investor_rejection' | 'admin_alert';
 }
 
 // Email templates
@@ -312,7 +312,7 @@ export const handler: Handler = async (event) => {
       subject: emailData.subject,
       htmlContent: emailData.htmlContent,
       textContent: emailData.textContent,
-      type: type as any
+      type: type as EmailNotification['type']
     };
 
     const emailSent = await sendEmail(notification);
