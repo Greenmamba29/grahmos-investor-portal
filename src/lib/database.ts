@@ -15,11 +15,11 @@ const getDatabaseUrl = (): string => {
   } else if (import.meta.env?.DATABASE_URL) {
     databaseUrl = import.meta.env.DATABASE_URL;
   } else {
-    // Fallback to the actual configured URL from your .env
-    databaseUrl = 'postgresql://grahmos_user:9sLk7!pQx@db.grahmos.info:5432/grahmos_investor';
+    // No database URL found in environment
+    throw new Error('DATABASE_URL environment variable is not configured. Please set VITE_DATABASE_URL or DATABASE_URL in your .env file');
   }
   
-  console.log('🔧 Using database URL:', databaseUrl.replace(/:\/\/.*@/, '://***:***@')); // Hide credentials in logs
+  // Database URL configured
   return databaseUrl;
 };
 
@@ -34,15 +34,15 @@ export const connectToDatabase = async () => {
   try {
     // Test the connection
     await sql`SELECT 1`;
-    console.log('✅ Connected to Neon database successfully');
+    // Connected to Neon database successfully
     return true;
   } catch (error) {
-    console.error('❌ Failed to connect to Neon database:', error);
+    // Failed to connect to Neon database
     
     // Check if it's a configuration issue
     const dbUrl = getDatabaseUrl();
     if (dbUrl.includes('username:password@host') || dbUrl === 'postgresql://username:password@host/database?sslmode=require') {
-      console.error('🔧 Database URL appears to be using placeholder values. Please configure your .env file with actual Neon credentials.');
+      // Database URL appears to be using placeholder values
     }
     
     return false;
