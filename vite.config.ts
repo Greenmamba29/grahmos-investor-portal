@@ -21,10 +21,20 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     target: 'esnext',
-    minify: 'esbuild',
+    minify: mode === 'production' ? 'terser' : 'esbuild',
     cssMinify: true,
     sourcemap: false,
     reportCompressedSize: false,
+    terserOptions: mode === 'production' ? {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+      },
+      format: {
+        comments: false,
+      },
+    } : undefined,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -32,9 +42,13 @@ export default defineConfig(({ mode }) => ({
           'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
           'vendor-query': ['@tanstack/react-query'],
           'vendor-icons': ['lucide-react'],
-        }
+          'vendor-three': ['three'],
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       }
     },
-    chunkSizeWarningLimit: 300
+    chunkSizeWarningLimit: 500
   }
 }));

@@ -1,5 +1,6 @@
 import { dbOperations, createTables } from './schema';
 import { connectToDatabase } from './database';
+import { error as logError } from './logger';
 
 // Initialize database tables on first run
 let tablesInitialized = false;
@@ -40,7 +41,7 @@ export const api = {
         message: `Successfully added ${data.email} to newsletter`
       };
   } catch (error) {
-      console.error('Newsletter signup error:', error);
+      logError('Newsletter signup error:', error);
       
       // Handle duplicate email error gracefully
       if (error instanceof Error && error.message.includes('duplicate key')) {
@@ -113,7 +114,7 @@ export const api = {
         message: `Account created successfully for ${data.email}`
       };
     } catch (error) {
-      console.error('User registration error:', error);
+      logError('User registration error:', error);
       
       if (error instanceof Error && error.message.includes('duplicate key')) {
         return {
@@ -183,7 +184,7 @@ export const api = {
         message: `Investor account created successfully for ${data.email}`
       };
     } catch (error) {
-      console.error('Investor registration error:', error);
+      logError('Investor registration error:', error);
       
       if (error instanceof Error && error.message.includes('duplicate key')) {
         return {
@@ -236,7 +237,7 @@ export const api = {
         message: 'Login successful'
       };
     } catch (error) {
-      console.error('User login error:', error);
+      logError('User login error:', error);
       return {
         success: false,
         error: 'Login failed',
@@ -255,7 +256,7 @@ export const api = {
         data: stats
       };
     } catch (error) {
-      console.error('Stats error:', error);
+      logError('Stats error:', error);
       return {
         success: false,
         error: 'Failed to fetch statistics',

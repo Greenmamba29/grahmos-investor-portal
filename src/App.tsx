@@ -44,8 +44,7 @@ const queryClient = new QueryClient({
 function HandlerRoutes() {
   const location = useLocation();
   
-  // Debug: Log the handler path being accessed
-  console.log('Stack Auth Handler accessing path (disabled):', location.pathname);
+  // Stack Auth handler path: location.pathname
   
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
@@ -89,16 +88,13 @@ const App = () => (
                     <Dashboard />
                   </ProtectedRoute>
                 } />
-                <Route path="/investor" element={
-                  <ProtectedRoute requiredRoles={['investor', 'admin']}>
-                    <InvestorPortal />
-                  </ProtectedRoute>
-                } />
                 <Route path="/investor-portal" element={
                   <ProtectedRoute requiredRoles={['investor', 'admin']}>
                     <InvestorPortal />
                   </ProtectedRoute>
                 } />
+                {/* Redirect old investor path to new one */}
+                <Route path="/investor" element={<Navigate to="/investor-portal" replace />} />
                 
                 {/* Legacy routes for backward compatibility */}
                 <Route path="/portal/:slug" element={<Portal />} />
@@ -114,16 +110,13 @@ const App = () => (
                     <InvestorPortal />
                   </ProtectedRoute>
                 } />
-                <Route path="/admin" element={
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } />
                 <Route path="/admin/dashboard" element={
                   <ProtectedRoute requiredRole="admin">
                     <AdminDashboard />
                   </ProtectedRoute>
                 } />
+                {/* Redirect /admin to /admin/dashboard */}
+                <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/requests" element={
                   <ProtectedRoute requiredRole="admin">
                     <AdminRequests />
