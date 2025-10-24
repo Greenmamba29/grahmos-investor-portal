@@ -1,5 +1,5 @@
 import { Navigation } from './Navigation';
-import { Footer } from './Footer';
+import { EcosystemFooter } from './EcosystemFooter';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ export function Layout({ children }: LayoutProps) {
       <main className="flex-1">
         {children}
       </main>
-      <Footer />
+      <EcosystemFooter />
     </div>
   );
 }

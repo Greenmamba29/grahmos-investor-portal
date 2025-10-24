@@ -3,10 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-// Temporarily disabled Stack Auth imports to fix React conflicts
-// import { StackHandler, StackProvider, StackTheme } from "@stackframe/react";
-import { Suspense } from "react";
-import { stackClientApp } from "./stack";
+import { Suspense, useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -57,10 +54,123 @@ function HandlerRoutes() {
   );
 }
 
-const App = () => (
-  <ErrorBoundary>
-    <Suspense fallback={"Loading..."}>
-      <BrowserRouter>
+// Enhanced Loading Component
+const LoadingScreen = () => {
+  const [loadingMessage, setLoadingMessage] = useState('Initializing GrahmOS Portal...');
+  const [showDebugInfo, setShowDebugInfo] = useState(false);
+  
+  useEffect(() => {
+    const messages = [
+      'Loading components...',
+      'Establishing secure connection...',
+      'Preparing investor dashboard...',
+      'Almost ready...'
+    ];
+    
+    let messageIndex = 0;
+    const interval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % messages.length;
+      setLoadingMessage(messages[messageIndex]);
+    }, 1500);
+    
+    // Show debug info after 10 seconds
+    const debugTimer = setTimeout(() => {
+      setShowDebugInfo(true);
+    }, 10000);
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(debugTimer);
+    };
+  }, []);
+  
+  return (
+    <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
+      <div className="text-center max-w-md mx-auto p-8">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-8" />
+        
+        <div className="mb-6">
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center font-bold text-xl text-primary-foreground glow mx-auto mb-4">
+            G
+          </div>
+          <h1 className="text-2xl font-bold text-gradient mb-2">GrahmOS Connect</h1>
+          <p className="text-muted-foreground">{loadingMessage}</p>
+        </div>
+        
+        <div className="w-full bg-border rounded-full h-2 mb-4">
+          <div className="bg-primary h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+        </div>
+        
+        {showDebugInfo && (
+          <div className="mt-6 p-4 bg-card/50 rounded-lg border text-sm text-left">
+            <h3 className="font-semibold mb-2">Debug Information:</h3>
+            <div className="space-y-1 text-xs text-muted-foreground font-mono">
+              <div>Mode: {import.meta.env.MODE}</div>
+              <div>Dev: {import.meta.env.DEV ? 'Yes' : 'No'}</div>
+              <div>URL: {window.location.href}</div>
+              <div>Time: {new Date().toISOString()}</div>
+            </div>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-3 px-3 py-1 bg-primary text-primary-foreground rounded text-xs hover:bg-primary/90"
+            >
+              Force Reload
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const App = () => {
+  const [appError, setAppError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Global error handler
+    const handleUnhandledError = (event: ErrorEvent) => {
+      console.error('🚨 Unhandled Error:', event.error);
+      setAppError(`Unhandled error: ${event.error?.message || 'Unknown error'}`);
+    };
+    
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('🚨 Unhandled Promise Rejection:', event.reason);
+      setAppError(`Promise rejection: ${event.reason?.message || 'Unknown rejection'}`);
+    };
+    
+    window.addEventListener('error', handleUnhandledError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    
+    return () => {
+      window.removeEventListener('error', handleUnhandledError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+  
+  if (appError) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-8">
+        <div className="text-center max-w-lg">
+          <h1 className="text-2xl font-bold text-destructive mb-4">Application Error</h1>
+          <p className="text-muted-foreground mb-6">{appError}</p>
+          <button 
+            onClick={() => {
+              setAppError(null);
+              window.location.reload();
+            }}
+            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+          >
+            Reload Application
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<LoadingScreen />}>
+        <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <AuthProvider>
@@ -141,9 +251,10 @@ const App = () => (
             </AuthProvider>
           </TooltipProvider>
         </QueryClientProvider>
-      </BrowserRouter>
-    </Suspense>
-  </ErrorBoundary>
-);
+        </BrowserRouter>
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
 
 export default App;

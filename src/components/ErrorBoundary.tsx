@@ -5,6 +5,7 @@ interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
   errorInfo?: React.ErrorInfo;
+  retryCount: number;
 }
 
 export class ErrorBoundary extends React.Component<
@@ -13,17 +14,61 @@ export class ErrorBoundary extends React.Component<
 > {
   constructor(props: React.PropsWithChildren<object>) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, retryCount: 0 };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+    console.error('🚨 CRITICAL ERROR DETECTED:', error);
+    // Log to external service if available
+    if (typeof window !== 'undefined' && window.location) {
+      console.error('🌍 Error occurred at:', window.location.href);
+    }
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('🔥 ErrorBoundary caught an error:', {
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href
+    });
+    
     this.setState({ error, errorInfo });
+    
+    // Send error to monitoring service (if available)
+    this.reportError(error, errorInfo);
   }
+
+  reportError = (error: Error, errorInfo: React.ErrorInfo) => {
+    try {
+      // You can integrate with services like Sentry, LogRocket, etc.
+      const errorReport = {
+        message: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        userAgent: navigator.userAgent
+      };
+      
+      console.warn('📊 Error report generated:', errorReport);
+      // localStorage.setItem('last-error', JSON.stringify(errorReport));
+    } catch (reportingError) {
+      console.error('Failed to report error:', reportingError);
+    }
+  };
+
+  handleRetry = () => {
+    this.setState(prevState => ({
+      hasError: false,
+      error: undefined,
+      errorInfo: undefined,
+      retryCount: prevState.retryCount + 1
+    }));
+  };
 
   render() {
     if (this.state.hasError) {
