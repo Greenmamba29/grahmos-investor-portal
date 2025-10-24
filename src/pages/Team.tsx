@@ -5,47 +5,48 @@ import { Linkedin, Mail, Trophy, Users, Target, Lightbulb } from 'lucide-react';
 export default function Team() {
   const leadership = [
     {
-      name: 'Graham Richardson',
+      name: 'Miquel McDonald',
       title: 'Founder & CEO',
-      bio: 'Former emergency response coordinator with 15 years experience in crisis communications. Led development of semantic search algorithms for government applications.',
-      expertise: ['Emergency Communications', 'Product Strategy', 'Government Relations'],
+      bio: 'Founder of GrahmOS, an offline-first directory operating system connecting over 80 million underserved users across Africa, Asia, and beyond — bridging the gap between technology and humanity.',
+      expertise: ['AI Systems & Multi-Agent Architecture', 'Product Vision & Ecosystem Strategy', 'Global Partnerships & Accessibility Technology'],
       achievements: [
-        'Led emergency response for 50+ major incidents',
-        'Published researcher in crisis communication protocols',
-        'Former consultant to Department of Homeland Security'
+        'Founded GrahmOS to unify the web into directory-based systems accessible offline',
+        'Leading discussions with Olympic Committee Nigeria & UN networks for pilot deployment',
+        'Architect of FileInASnap, an AI-powered file orchestration engine integrated into GrahmOS',
+        'Featured founder in LvlUp Labs and other global startup acceleration programs'
       ]
     },
     {
       name: 'Dr. Sarah Chen',
       title: 'CTO & Co-Founder',
-      bio: 'Former Principal Engineer at Google with expertise in distributed systems and mesh networking. PhD in Computer Science from Stanford.',
-      expertise: ['Mesh Networking', 'Distributed Systems', 'AI/ML'],
+      bio: 'Former Principal Engineer at Google, expert in mesh networking and distributed systems. Holds a PhD in Computer Science from Stanford, with 20+ patents and 40+ publications in resilient network design.',
+      expertise: ['Mesh Networking & Distributed Systems', 'Offline-first Data Synchronization', 'AI/ML for Communications Infrastructure'],
       achievements: [
-        '20+ patents in networking technology',
-        'Led mesh networking team at Google',
-        'Published 40+ papers in peer-reviewed journals'
-      ]
-    },
-    {
-      name: 'Michael Torres',
-      title: 'VP of Sales',
-      bio: 'Former VP of Enterprise Sales at Motorola Solutions. 12 years experience selling mission-critical communication systems to government and enterprise.',
-      expertise: ['Enterprise Sales', 'Channel Development', 'Customer Success'],
-      achievements: [
-        '$200M+ in career sales',
-        'Built sales teams from 0 to 50+',
-        'Established partnerships with major integrators'
+        'Led Google\'s mesh networking research group',
+        'Architected large-scale, low-bandwidth communication protocols',
+        'Author of multiple patents advancing decentralized connectivity'
       ]
     },
     {
       name: 'Amanda Foster',
       title: 'VP of Engineering',
-      bio: 'Former Staff Engineer at Signal with deep expertise in secure communications and cryptography. Led development of encrypted messaging protocols.',
-      expertise: ['Security Architecture', 'Cryptography', 'Mobile Development'],
+      bio: 'Former Staff Engineer at Signal, specializing in secure, encrypted, and zero-knowledge communications. Expert in cryptography and scalable mobile system architecture.',
+      expertise: ['Security Architecture', 'Cryptography & End-to-End Encryption', 'Mobile System Design'],
       achievements: [
-        'Core contributor to Signal Protocol',
-        'Security consultant for Fortune 500 companies',
-        'Expert in zero-knowledge cryptography'
+        'Core contributor to the Signal Protocol',
+        'Led mobile encryption rollout for Fortune 500 clients',
+        'Deep expertise in privacy-preserving communication systems'
+      ]
+    },
+    {
+      name: 'Michael Torres',
+      title: 'VP of Partnerships & Adoption',
+      bio: 'Former VP of Enterprise Sales at Motorola Solutions with 12+ years scaling mission-critical communication systems across government and enterprise sectors.',
+      expertise: ['Strategic Partnerships', 'Channel Development', 'Government & NGO Adoption'],
+      achievements: [
+        'Built Motorola\'s global emergency communications sales team',
+        'Trusted partner to agencies in 30+ countries',
+        'Experienced in aligning government adoption with humanitarian goals'
       ]
     }
   ];
@@ -71,21 +72,21 @@ export default function Team() {
   const organizationalStrengths = [
     {
       icon: Users,
-      title: 'Proven Track Record',
-      description: 'Combined 50+ years experience in emergency communications and enterprise software',
-      metrics: ['$500M+ career revenue generated', '100+ enterprise deals closed', '20+ patents filed']
+      title: 'Domain Mastery',
+      description: '50+ combined years in emergency communications, AI, and software systems',
+      metrics: ['Deep understanding of global crisis communication challenges', 'Experience designing mission-critical protocols', 'Used by governments and NGOs']
     },
     {
       icon: Target,
-      title: 'Domain Expertise',
-      description: 'Deep understanding of emergency response protocols and mission-critical systems',
-      metrics: ['15 years emergency response', '200+ crisis situations managed', '50+ safety protocols designed']
+      title: 'Technical Edge',
+      description: 'Pioneering offline-first operating system architecture',
+      metrics: ['Integrating mesh networking + AI agents', 'Intelligent, resilient communications', 'Secure, decentralized infrastructure']
     },
     {
       icon: Lightbulb,
-      title: 'Technical Innovation',
-      description: 'Cutting-edge expertise in mesh networking, cryptography, and semantic search',
-      metrics: ['40+ research publications', '20+ networking patents', '10+ security protocols']
+      title: 'Execution Capability',
+      description: 'Proven operators from Google, Signal, and Motorola',
+      metrics: ['Globally connected advisory network', 'Early pilot interest from international agencies', 'Military, tech, and enterprise experience']
     }
   ];
 
@@ -95,19 +96,19 @@ export default function Team() {
         {/* Header */}
         <div className="text-center mb-16">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/30">
-            World-Class Team
+            🌍 World-Class Team
           </Badge>
           <h1 className="section-header">Leadership Team</h1>
           <div className="section-divider mx-auto" />
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Proven executives and technical leaders with deep domain expertise in emergency 
-            communications, enterprise software, and mission-critical systems.
+            A visionary team of operators, engineers, and strategists united by one mission: to make communication and 
+            information access unstoppable — anywhere on Earth.
           </p>
         </div>
 
         {/* Leadership Team */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12">Executive Leadership</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">🧠 Executive Leadership</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {leadership.map((leader, index) => (
               <Card key={index} className="investor-card group">
@@ -210,22 +211,25 @@ export default function Team() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                To ensure that critical communications never fail when people need them most. 
-                We believe that access to information and the ability to communicate during 
-                emergencies should be a fundamental right, not dependent on fragile infrastructure.
+                To ensure that critical communication and access to information never fail — even when the internet does.
               </p>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                GrahmOS reimagines connectivity through a directory-based operating system that organizes, compresses, 
+                and delivers data offline, across mesh networks, and in low-bandwidth regions.
+              </p>
+              <h4 className="font-semibold mb-3 text-primary">Guiding Principles</h4>
               <div className="space-y-2">
                 <div className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-primary rounded-full mr-3" />
-                  <span>Lives first, technology second</span>
+                  <span>Lives first. Technology second.</span>
                 </div>
                 <div className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-primary rounded-full mr-3" />
-                  <span>Resilience over complexity</span>
+                  <span>Resilience over complexity.</span>
                 </div>
                 <div className="flex items-center text-sm">
                   <div className="w-2 h-2 bg-primary rounded-full mr-3" />
-                  <span>Universal access to emergency communications</span>
+                  <span>Access for all — online or off.</span>
                 </div>
               </div>
             </CardContent>
@@ -236,27 +240,24 @@ export default function Team() {
               <CardTitle>Why We Win</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                Our team combines unique domain expertise with proven execution capability. 
-                We've lived through the failures of existing systems and designed GrahmOS 
-                to address real-world challenges that others don't understand.
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                We're not building another app — we're building the infrastructure layer for global resilience.
               </p>
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-primary">50+</div>
-                  <div className="text-xs text-muted-foreground">Years Combined Experience</div>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                GrahmOS isn't competing with the web; it's redefining it for the 80 million people who have been left out.
+              </p>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center text-sm">
+                  <div className="w-2 h-2 bg-primary rounded-full mr-3" />
+                  <span>Decades of combined experience in resilient tech</span>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">$500M+</div>
-                  <div className="text-xs text-muted-foreground">Career Revenue Generated</div>
+                <div className="flex items-center text-sm">
+                  <div className="w-2 h-2 bg-primary rounded-full mr-3" />
+                  <span>Real-world crisis management and network design experience</span>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">20+</div>
-                  <div className="text-xs text-muted-foreground">Patents & IP</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">200+</div>
-                  <div className="text-xs text-muted-foreground">Crisis Situations Managed</div>
+                <div className="flex items-center text-sm">
+                  <div className="w-2 h-2 bg-primary rounded-full mr-3" />
+                  <span>A founding team that's lived the problem and built the solution</span>
                 </div>
               </div>
             </CardContent>
@@ -269,26 +270,32 @@ export default function Team() {
             <div className="text-center max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold mb-6 text-gradient">Growth & Hiring Plan</h2>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                With Series A funding, we plan to scale from <span className="text-primary font-semibold">15 to 65 employees</span> 
-                by end of 2026, focusing on engineering, sales, and customer success to support rapid growth.
+                With our <span className="text-primary font-semibold">$5M pre-seed raise</span>, GrahmOS will transition from 
+                prototype to pilot deployments, expand our technical team, and launch regional partnerships across Africa and Asia.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div>
-                  <div className="text-3xl font-bold text-primary mb-2">+20</div>
-                  <div className="text-sm text-muted-foreground">Engineering Hires</div>
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-primary mb-4">2025–2026 Roadmap</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center p-4 bg-card/50 rounded-lg border border-primary/20">
+                    <div className="text-3xl font-bold text-primary mb-2">+15</div>
+                    <div className="text-sm text-muted-foreground mb-2">Engineering & AI</div>
+                    <div className="text-xs text-muted-foreground">Core OS & mesh platform development</div>
+                  </div>
+                  <div className="text-center p-4 bg-card/50 rounded-lg border border-primary/20">
+                    <div className="text-3xl font-bold text-primary mb-2">+10</div>
+                    <div className="text-sm text-muted-foreground mb-2">Deployment & Partnerships</div>
+                    <div className="text-xs text-muted-foreground">Government & NGO pilot support</div>
+                  </div>
+                  <div className="text-center p-4 bg-card/50 rounded-lg border border-primary/20">
+                    <div className="text-3xl font-bold text-primary mb-2">+5</div>
+                    <div className="text-sm text-muted-foreground mb-2">Ops & Compliance</div>
+                    <div className="text-xs text-muted-foreground">Regional rollout, localization, training</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-3xl font-bold text-primary mb-2">+15</div>
-                  <div className="text-sm text-muted-foreground">Sales Team</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-primary mb-2">+10</div>
-                  <div className="text-sm text-muted-foreground">Customer Success</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-primary mb-2">+5</div>
-                  <div className="text-sm text-muted-foreground">Operations</div>
-                </div>
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-semibold text-primary">Pilot Targets</p>
+                <p className="text-muted-foreground">Nigeria, Kenya, Japan, and rural U.S.</p>
               </div>
             </div>
           </CardContent>

@@ -8,26 +8,26 @@ import EmailSignup from '@/components/EmailSignup';
 
 export default function Overview() {
   const keyMetrics = [
-    { label: 'Total Addressable Market', value: '$577.9B', icon: Target, change: '+12.8% CAGR' },
-    { label: 'Stadium Market Opportunity', value: '$45B', icon: Users, change: '+14.9% CAGR' },
-    { label: 'Target Market Share', value: '8.5%', icon: TrendingUp, change: 'by 2030' },
+    { label: 'Underserved Users', value: '80M+', icon: Users, change: 'Africa & Asia' },
+    { label: 'Offline-First Architecture', value: '100%', icon: Wifi, change: 'No Internet Required' },
+    { label: 'Target Markets', value: '4', icon: Target, change: 'Pilot Regions' },
   ];
 
   const keyFeatures = [
     {
       icon: Wifi,
-      title: '100% Offline Functionality',
-      description: 'Operates completely without internet or cellular connectivity through proprietary mesh networking.'
+      title: 'Offline-First Directory OS',
+      description: 'Revolutionary directory-based operating system that organizes, compresses, and delivers data offline across mesh networks.'
     },
     {
       icon: Search,
-      title: 'Semantic Search Engine',
-      description: 'Context-aware search delivers relevant emergency protocols even in offline mode.'
+      title: 'AI-Powered Intelligence',
+      description: 'Multi-agent AI architecture for intelligent file orchestration and resilient communication, even without connectivity.'
     },
     {
       icon: Shield,
-      title: 'Military-Grade Security',
-      description: 'End-to-end encryption with zero-knowledge architecture exceeds industry standards.'
+      title: 'Resilient Infrastructure',
+      description: 'Designed to survive outages and disasters — communication that works when traditional systems fail.'
     }
   ];
 
@@ -41,12 +41,19 @@ export default function Overview() {
             <div>
               <h1 className="text-5xl lg:text-6xl font-bold mb-6">
                 <span className="text-gradient">GrahmOS</span><br />
-                <span className="text-foreground">The OS of Meaning</span>
+                <span className="text-foreground">The Operating System for the Next Billion Users</span>
               </h1>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Revolutionary emergency communication platform that operates 100% offline. 
-                Capturing the $577.9B emergency communication market with proprietary semantic mesh technology.
+                The world's first offline-first directory operating system — connecting over 80 million underserved users 
+                across Africa, Asia, and beyond when the internet fails.
               </p>
+              <div className="bg-card/50 border border-primary/30 rounded-lg p-6 mb-8">
+                <h3 className="text-lg font-semibold mb-3 text-primary">The World Problem We're Solving</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Fragile communications infrastructure leaves billions disconnected during crises. 
+                  GrahmOS ensures critical communication and information access never fail — even when the internet does.
+                </p>
+              </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/market">
                   <Button size="lg" className="glow">
@@ -79,10 +86,10 @@ export default function Overview() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="section-header">Market Opportunity</h2>
+            <h2 className="section-header">Global Impact & Reach</h2>
             <div className="section-divider mx-auto" />
             <p className="text-xl text-muted-foreground">
-              Massive addressable market with clear path to profitability
+              Bridging the gap between technology and humanity for underserved populations
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -110,10 +117,10 @@ export default function Overview() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="section-header">Competitive Advantages</h2>
+            <h2 className="section-header">The Breakthrough Product</h2>
             <div className="section-divider mx-auto" />
             <p className="text-xl text-muted-foreground">
-              Proprietary technology that outperforms existing solutions
+              We're not building another app — we're building the infrastructure layer for global resilience
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -140,29 +147,35 @@ export default function Overview() {
           <Card className="investor-card bg-gradient-glow border-primary/30">
             <CardContent className="p-12">
               <div className="text-center">
-                <h2 className="text-3xl font-bold mb-6 text-gradient">Investment Highlights</h2>
+                <h2 className="text-3xl font-bold mb-6 text-gradient">Why GrahmOS is Inevitable</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
                   <div>
-                    <h3 className="text-xl font-semibold mb-4 text-primary">Market Position</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">The Mission</h3>
                     <ul className="space-y-2 text-muted-foreground">
-                      <li>• First-to-market with offline semantic search</li>
-                      <li>• 14.9% CAGR in target stadium market segment</li>
-                      <li>• Low competition in emergency communication</li>
+                      <li>• Lives first. Technology second.</li>
+                      <li>• Resilience over complexity</li>
+                      <li>• Access for all — online or off</li>
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold mb-4 text-primary">Technology Edge</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-primary">The Execution</h3>
                     <ul className="space-y-2 text-muted-foreground">
-                      <li>• Proprietary mesh networking technology</li>
-                      <li>• Military-grade security architecture</li>
-                      <li>• 100% offline functionality guarantee</li>
+                      <li>• Pioneering directory-based OS architecture</li>
+                      <li>• Early pilot interest: Nigeria, Kenya, Japan, rural US</li>
+                      <li>• Mission-driven founder with global credibility</li>
                     </ul>
                   </div>
                 </div>
+                <div className="mt-8 p-6 bg-card/50 rounded-lg border border-primary/30">
+                  <p className="text-lg font-semibold text-primary mb-2">$5M Pre-Seed Raise</p>
+                  <p className="text-muted-foreground">
+                    Transitioning from prototype to pilot deployments across Africa and Asia
+                  </p>
+                </div>
                 <div className="mt-8">
-                  <Link to="/market">
+                  <Link to="/team">
                     <Button size="lg" className="glow">
-                      Explore Full Analysis
+                      Meet the Team
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>

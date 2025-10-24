@@ -6,11 +6,11 @@ import { Menu, X, ChevronRight } from 'lucide-react';
 
 const navigationItems = [
   { name: 'Overview', href: '/' },
-  { name: 'Market Analysis', href: '/market' },
-  { name: 'Product', href: '/product' },
-  { name: 'Competitive Edge', href: '/competitive' },
-  { name: 'Financial Outlook', href: '/financial' },
-  { name: 'Team', href: '/team' },
+  { name: 'Problem & Market', href: '/market' },
+  { name: 'Technology', href: '/product' },
+  { name: 'Leadership & Team', href: '/team' },
+  { name: 'Go-To-Market', href: '/competitive' },
+  { name: 'Financial Plan', href: '/financial' },
 ];
 
 export function Navigation() {
