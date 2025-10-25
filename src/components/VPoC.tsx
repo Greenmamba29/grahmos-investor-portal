@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 
 type State = 'online' | 'outage' | 'reconnect';
@@ -21,13 +21,13 @@ export default function VPoC() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const cloudVisible = state !== 'outage';
+  const cloudVisible = useMemo(() => state !== 'outage', [state]);
   
-  const status = {
+  const status = useMemo(() => ({
     online: 'Online: cloud + mesh syncing normally',
     outage: 'Outage: cloud links severed; local mesh serving requests',
     reconnect: 'Reconnect: diff syncing; converging to latest state',
-  }[state];
+  }[state]), [state]);
 
   return (
     <section 

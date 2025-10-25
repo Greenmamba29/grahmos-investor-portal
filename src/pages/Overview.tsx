@@ -75,14 +75,14 @@ export default function Overview() {
       </section>
 
       {/* VPoC Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <VPoC />
         </div>
       </section>
 
       {/* Principles Section */}
-      <section id="principles" className="py-16 px-4 sm:px-6 lg:px-8 bg-card/30">
+      <section id="principles" className="py-16 px-4 sm:px-6 lg:px-8 bg-card/30 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Principles</h2>
@@ -166,7 +166,7 @@ export default function Overview() {
       </section>
 
       {/* Real Stories Section */}
-      <section id="stories" className="py-16 px-4 sm:px-6 lg:px-8">
+      <section id="stories" className="py-16 px-4 sm:px-6 lg:px-8 scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Real Stories</h2>
@@ -401,10 +401,18 @@ export default function Overview() {
               variant="outline" 
               size="lg" 
               onClick={() => {
-                document.querySelector('#newsletter')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const element = document.querySelector('#newsletter');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  // Focus on email input after scroll
+                  setTimeout(() => {
+                    const emailInput = element.querySelector('input[type="email"]') as HTMLInputElement;
+                    emailInput?.focus();
+                  }, 500);
+                }
               }}
             >
-              Join the Newsletter
+              Join the Movement
             </Button>
             <Button variant="outline" size="lg" asChild>
               <a href="#" onClick={(e) => { e.preventDefault(); alert('Share functionality coming soon!'); }}>
@@ -419,7 +427,7 @@ export default function Overview() {
       </section>
 
       {/* Email Signup */}
-      <section id="newsletter" className="py-16 px-4 sm:px-6 lg:px-8">
+      <section id="newsletter" className="py-16 px-4 sm:px-6 lg:px-8 scroll-mt-20">
         <div className="max-w-2xl mx-auto">
           <EmailSignup 
             type="investor_interest"

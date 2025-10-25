@@ -60,7 +60,12 @@ export function EcosystemFooter() {
                   href="#how-it-works" 
                   onClick={(e) => {
                     e.preventDefault();
-                    document.querySelector('#how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const element = document.querySelector('#how-it-works');
+                    if (element) {
+                      const yOffset = -80;
+                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
                   }}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
@@ -72,7 +77,12 @@ export function EcosystemFooter() {
                   href="#principles" 
                   onClick={(e) => {
                     e.preventDefault();
-                    document.querySelector('#principles')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const element = document.querySelector('#principles');
+                    if (element) {
+                      const yOffset = -80;
+                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
                   }}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
@@ -84,7 +94,12 @@ export function EcosystemFooter() {
                   href="#stories" 
                   onClick={(e) => {
                     e.preventDefault();
-                    document.querySelector('#stories')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const element = document.querySelector('#stories');
+                    if (element) {
+                      const yOffset = -80;
+                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
                   }}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
@@ -92,7 +107,7 @@ export function EcosystemFooter() {
                 </a>
               </li>
               <li>
-                <Link to="/technology" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/product" className="text-muted-foreground hover:text-foreground transition-colors">
                   Technology
                 </Link>
               </li>
@@ -122,7 +137,17 @@ export function EcosystemFooter() {
                   href="#newsletter" 
                   onClick={(e) => {
                     e.preventDefault();
-                    document.querySelector('#newsletter')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const element = document.querySelector('#newsletter');
+                    if (element) {
+                      const yOffset = -80;
+                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                      window.scrollTo({ top: y, behavior: 'smooth' });
+                      // Focus on email input
+                      setTimeout(() => {
+                        const emailInput = element.querySelector('input[type="email"]') as HTMLInputElement;
+                        emailInput?.focus();
+                      }, 500);
+                    }
                   }}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >

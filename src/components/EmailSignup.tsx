@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Mail, Loader2 } from 'lucide-react';
-// Supabase integration removed for compatibility
+import { useToast } from '@/hooks/use-toast';
 
 interface EmailSignupProps {
   type?: 'newsletter' | 'investor_interest';
@@ -19,17 +18,30 @@ export default function EmailSignup({
 }: EmailSignupProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setMessage('');
 
     if (!email) {
-      setError('Please enter your email address');
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
       setIsLoading(false);
       return;
     }
@@ -37,16 +49,25 @@ export default function EmailSignup({
     // Mock signup - in production, this would integrate with a backend service
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // For demo purposes, always show success
-      setMessage('Thank you! You\'ve been added to our list.');
+      toast({
+        title: "✅ Subscribed Successfully!",
+        description: type === 'investor_interest' 
+          ? "You'll receive exclusive investor updates and funding announcements."
+          : "You'll receive the latest updates on GrahmOS development.",
+      });
+      
       setEmail('');
       
       // Optional: You could send this to your actual backend here
       console.log(`Email signup: ${email} for ${type}`);
     } catch (error) {
-      setError('Something went wrong. Please try again.');
+      toast({
+        title: "Subscription Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
     }
 
     setIsLoading(false);
@@ -64,18 +85,6 @@ export default function EmailSignup({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {message && (
-          <Alert className="mb-4 border-success/20 bg-success/5">
-            <AlertDescription className="text-success">{message}</AlertDescription>
-          </Alert>
-        )}
-
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
           <Input
             type="email"

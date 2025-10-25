@@ -45,7 +45,11 @@ export function Navigation() {
                     onClick={(e) => {
                       e.preventDefault();
                       const element = document.querySelector(item.href);
-                      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      if (element) {
+                        const yOffset = -80; // Account for sticky header
+                        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                      }
                       setIsMobileMenuOpen(false);
                     }}
                     className={cn(
@@ -110,7 +114,11 @@ export function Navigation() {
                     onClick={(e) => {
                       e.preventDefault();
                       const element = document.querySelector(item.href);
-                      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      if (element) {
+                        const yOffset = -80; // Account for sticky header
+                        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                      }
                       setIsMobileMenuOpen(false);
                     }}
                     className={cn(
