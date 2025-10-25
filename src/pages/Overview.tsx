@@ -35,11 +35,31 @@ export default function Overview() {
             {/* Trust Strip */}
             <div className="border-t border-border/30 pt-8 mt-12">
               <p className="text-xs uppercase tracking-wide text-muted-foreground mb-4">Trusted By</p>
-              <div className="flex flex-wrap justify-center items-center gap-8 opacity-70">
-                <Badge variant="outline" className="text-sm py-2 px-4">Ministry of Education</Badge>
-                <Badge variant="outline" className="text-sm py-2 px-4">Rural Health Network</Badge>
-                <Badge variant="outline" className="text-sm py-2 px-4">Telecom Infrastructure</Badge>
-                <Badge variant="outline" className="text-sm py-2 px-4">Government Pilot</Badge>
+              <div className="flex flex-wrap justify-center items-center gap-4">
+                <Badge 
+                  variant="outline" 
+                  className="text-sm py-2 px-4 transition-all duration-300 hover:bg-primary/10 hover:border-primary/50 hover:scale-105 cursor-default"
+                >
+                  Ministry of Education
+                </Badge>
+                <Badge 
+                  variant="outline" 
+                  className="text-sm py-2 px-4 transition-all duration-300 hover:bg-primary/10 hover:border-primary/50 hover:scale-105 cursor-default"
+                >
+                  Rural Health Network
+                </Badge>
+                <Badge 
+                  variant="outline" 
+                  className="text-sm py-2 px-4 transition-all duration-300 hover:bg-primary/10 hover:border-primary/50 hover:scale-105 cursor-default"
+                >
+                  Telecom Infrastructure
+                </Badge>
+                <Badge 
+                  variant="outline" 
+                  className="text-sm py-2 px-4 transition-all duration-300 hover:bg-primary/10 hover:border-primary/50 hover:scale-105 cursor-default"
+                >
+                  Government Pilot
+                </Badge>
               </div>
             </div>
 
@@ -377,8 +397,14 @@ export default function Overview() {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-            <Button variant="outline" size="lg" asChild>
-              <a href="/community#subscribe">Join the Newsletter</a>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={() => {
+                document.querySelector('#newsletter')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
+              Join the Newsletter
             </Button>
             <Button variant="outline" size="lg" asChild>
               <a href="#" onClick={(e) => { e.preventDefault(); alert('Share functionality coming soon!'); }}>
@@ -386,14 +412,14 @@ export default function Overview() {
               </a>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href="/partners">Partner With Us</a>
+              <Link to="/partners">Partner With Us</Link>
             </Button>
           </div>
         </div>
       </section>
 
       {/* Email Signup */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      <section id="newsletter" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           <EmailSignup 
             type="investor_interest"

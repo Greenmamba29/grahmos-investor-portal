@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, ChevronRight } from 'lucide-react';
 
 const navigationItems = [
-  { name: 'Overview', href: '/' },
-  { name: 'How It Works', href: '/#how-it-works' },
-  { name: 'Principles', href: '/#principles' },
-  { name: 'Stories', href: '/#stories' },
-  { name: 'Investors', href: '/investor-relations' },
-  { name: 'Partners', href: '/partners' },
-  { name: 'Team', href: '/team' },
+  { name: 'Overview', href: '/', isScroll: false },
+  { name: 'How It Works', href: '#how-it-works', isScroll: true },
+  { name: 'Principles', href: '#principles', isScroll: true },
+  { name: 'Stories', href: '#stories', isScroll: true },
+  { name: 'Investors', href: '/investor-relations', isScroll: false },
+  { name: 'Partners', href: '/partners', isScroll: false },
+  { name: 'Team', href: '/team', isScroll: false },
 ];
 
 export function Navigation() {
@@ -35,7 +35,31 @@ export function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-4 xl:space-x-6">
             {navigationItems.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = location.pathname === item.href || (item.isScroll && location.pathname === '/');
+              
+              if (item.isScroll) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const element = document.querySelector(item.href);
+                      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      'px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-300 hover:text-primary cursor-pointer',
+                      isActive
+                        ? 'text-primary bg-primary/10 border border-primary/20'
+                        : 'text-muted-foreground hover:bg-card'
+                    )}
+                  >
+                    {item.name}
+                  </a>
+                );
+              }
+              
               return (
                 <Link
                   key={item.name}
@@ -76,7 +100,31 @@ export function Navigation() {
         <div className="lg:hidden backdrop-glass border-t border-border/50">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navigationItems.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = location.pathname === item.href || (item.isScroll && location.pathname === '/');
+              
+              if (item.isScroll) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const element = document.querySelector(item.href);
+                      element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      'block px-3 py-2 rounded-md text-base font-medium transition-colors cursor-pointer',
+                      isActive
+                        ? 'text-primary bg-primary/10'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-card'
+                    )}
+                  >
+                    {item.name}
+                  </a>
+                );
+              }
+              
               return (
                 <Link
                   key={item.name}

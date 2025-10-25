@@ -56,17 +56,38 @@ export function EcosystemFooter() {
             <h4 className="font-semibold mb-4">Explore</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a 
+                  href="#how-it-works" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.querySelector('#how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
                   How It Works
                 </a>
               </li>
               <li>
-                <a href="/#principles" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a 
+                  href="#principles" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.querySelector('#principles')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
                   Principles
                 </a>
               </li>
               <li>
-                <a href="/#stories" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a 
+                  href="#stories" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.querySelector('#stories')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
                   Stories
                 </a>
               </li>
@@ -97,8 +118,15 @@ export function EcosystemFooter() {
                 </Link>
               </li>
               <li>
-                <a href="/#community" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Join the Movement
+                <a 
+                  href="#newsletter" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.querySelector('#newsletter')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  Join the Newsletter
                 </a>
               </li>
             </ul>
