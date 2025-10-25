@@ -27,6 +27,7 @@ import AdminRequests from "./pages/AdminRequests";
 import AdminDashboard from "./pages/AdminDashboard";
 import ResetPassword from "./pages/ResetPassword";
 import InvestorRelations from "./pages/InvestorRelations";
+import CaseStudies from "./pages/CaseStudies";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -190,6 +191,7 @@ const App = () => {
                 <Route path="/financial" element={<Layout><Financial /></Layout>} />
                 <Route path="/team" element={<Layout><Team /></Layout>} />
                 <Route path="/investor-relations" element={<Layout><InvestorRelations /></Layout>} />
+                <Route path="/case-studies" element={<Layout><CaseStudies /></Layout>} />
                 <Route path="/partners" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Partners</h1><p className="text-xl text-muted-foreground">Partnership page coming soon. Contact partners@grahmos.info</p></div></div></Layout>} />
                 <Route path="/manifesto" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Manifesto</h1><p className="text-xl text-muted-foreground">Coming soon</p></div></div></Layout>} />
                 <Route path="/press" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Press Kit</h1><p className="text-xl text-muted-foreground">Coming soon</p></div></div></Layout>} />

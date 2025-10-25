@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Menu, X, ChevronRight } from 'lucide-react';
@@ -17,6 +17,32 @@ const navigationItems = [
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleScrollClick = (href: string) => {
+    // If not on homepage, navigate there first, then scroll
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Use setTimeout to ensure DOM is ready after navigation
+      setTimeout(() => {
+        const element = document.querySelector(href);
+        if (element) {
+          const yOffset = -80;
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      // Already on homepage, just scroll
+      const element = document.querySelector(href);
+      if (element) {
+        const yOffset = -80;
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <nav className="backdrop-glass border-b border-border/50 sticky top-0 z-50">
@@ -44,13 +70,7 @@ export function Navigation() {
                     href={item.href}
                     onClick={(e) => {
                       e.preventDefault();
-                      const element = document.querySelector(item.href);
-                      if (element) {
-                        const yOffset = -80; // Account for sticky header
-                        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                        window.scrollTo({ top: y, behavior: 'smooth' });
-                      }
-                      setIsMobileMenuOpen(false);
+                      handleScrollClick(item.href);
                     }}
                     className={cn(
                       'px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-300 hover:text-primary cursor-pointer',
@@ -113,13 +133,7 @@ export function Navigation() {
                     href={item.href}
                     onClick={(e) => {
                       e.preventDefault();
-                      const element = document.querySelector(item.href);
-                      if (element) {
-                        const yOffset = -80; // Account for sticky header
-                        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                        window.scrollTo({ top: y, behavior: 'smooth' });
-                      }
-                      setIsMobileMenuOpen(false);
+                      handleScrollClick(item.href);
                     }}
                     className={cn(
                       'block px-3 py-2 rounded-md text-base font-medium transition-colors cursor-pointer',

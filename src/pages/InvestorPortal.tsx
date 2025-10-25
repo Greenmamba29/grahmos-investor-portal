@@ -22,6 +22,7 @@ import {
   Award
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthContext';
+import DocumentLibrary from '@/components/DocumentLibrary';
 
 export default function InvestorPortal() {
   const { user, logout, isLoading } = useAuth();
@@ -460,28 +461,7 @@ export default function InvestorPortal() {
                 <CardDescription>Confidential materials for qualified investors</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {[
-                    { title: 'Executive Summary & Pitch Deck', size: '2.4 MB', updated: '2 days ago', type: 'PDF' },
-                    { title: 'Financial Model & Projections', size: '1.8 MB', updated: '1 week ago', type: 'XLSX' },
-                    { title: 'Technical Architecture Whitepaper', size: '3.2 MB', updated: '3 weeks ago', type: 'PDF' },
-                    { title: 'Market Research Report', size: '4.7 MB', updated: '1 month ago', type: 'PDF' },
-                    { title: 'Legal Documents & Terms Sheet', size: '892 KB', updated: '2 weeks ago', type: 'PDF' }
-                  ].map((doc, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-card/50 rounded-lg border border-border/50 hover:bg-card transition-colors">
-                      <div className="flex items-center space-x-3">
-                        <FileText className="h-5 w-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">{doc.title}</p>
-                          <p className="text-sm text-muted-foreground">{doc.size} • Updated {doc.updated}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Download {doc.type}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                <DocumentLibrary />
               </CardContent>
             </Card>
           </TabsContent>

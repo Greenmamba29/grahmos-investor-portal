@@ -1,20 +1,77 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 
 type State = 'online' | 'outage' | 'reconnect';
+
+const STATE_DURATION = 8000; // 8 seconds per state
+const STATES: State[] = ['online', 'outage', 'reconnect'];
 
 export default function VPoC() {
   const [state, setState] = useState<State>('online');
   const [prefersReduced, setReduced] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  // Advance to next state
+  const advanceState = useCallback(() => {
+    setState((current) => {
+      const currentIndex = STATES.indexOf(current);
+      const nextIndex = (currentIndex + 1) % STATES.length;
+      return STATES[nextIndex];
+    });
+    setProgress(0);
+  }, []);
+
+  // Go to previous state
+  const previousState = useCallback(() => {
+    setState((current) => {
+      const currentIndex = STATES.indexOf(current);
+      const prevIndex = currentIndex === 0 ? STATES.length - 1 : currentIndex - 1;
+      return STATES[prevIndex];
+    });
+    setProgress(0);
+  }, []);
+
+  // Reset to online state
+  const resetToOnline = useCallback(() => {
+    setState('online');
+    setProgress(0);
+    setIsPaused(false);
+  }, []);
+
+  // Auto-advance effect
+  useEffect(() => {
+    if (isPaused || prefersReduced) return;
+
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          return 0;
+        }
+        return prev + (100 / (STATE_DURATION / 100));
+      });
+    }, 100);
+
+    const advanceTimer = setTimeout(() => {
+      advanceState();
+    }, STATE_DURATION);
+
+    return () => {
+      clearInterval(progressInterval);
+      clearTimeout(advanceTimer);
+    };
+  }, [state, isPaused, prefersReduced, advanceState]);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReduced(mq.matches);
     
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === '1') setState('online');
-      if (e.key === '2') setState('outage');
-      if (e.key === '3') setState('reconnect');
+      if (e.key === '1') { setState('online'); setProgress(0); }
+      if (e.key === '2') { setState('outage'); setProgress(0); }
+      if (e.key === '3') { setState('reconnect'); setProgress(0); }
+      if (e.key === ' ') { e.preventDefault(); setIsPaused((p) => !p); }
     };
     
     window.addEventListener('keydown', onKey);
@@ -28,6 +85,36 @@ export default function VPoC() {
     outage: 'Outage: cloud links severed; local mesh serving requests',
     reconnect: 'Reconnect: diff syncing; converging to latest state',
   }[state]), [state]);
+
+  const stateLabels = useMemo(() => ({
+    online: { title: 'Normal Operations | All Systems Connected', subtitle: 'Cloud Sync: Active ✓ | Avg Response: 45ms' },
+    outage: { title: 'Internet Outage Detected | Local Mesh Active', subtitle: 'Local Sync: Active ✓ | Cloud Sync: Offline' },
+    reconnect: { title: 'Connection Restored | Reconciliation Complete', subtitle: 'Merging offline transactions... Complete ✓' },
+  }[state]), [state]);
+
+  // 12 facility nodes in a circular/mesh layout
+  const facilities = useMemo(() => [
+    { x: 100, y: 160, label: 'Clinic 1' },
+    { x: 160, y: 100, label: 'School 1' },
+    { x: 240, y: 80, label: 'Clinic 2' },
+    { x: 320, y: 100, label: 'Hub 1' },
+    { x: 380, y: 160, label: 'Clinic 3' },
+    { x: 400, y: 240, label: 'School 2' },
+    { x: 360, y: 310, label: 'Clinic 4' },
+    { x: 280, y: 340, label: 'Hub 2' },
+    { x: 200, y: 320, label: 'Clinic 5' },
+    { x: 140, y: 270, label: 'School 3' },
+    { x: 100, y: 200, label: 'Clinic 6' },
+    { x: 520, y: 200, label: 'Hub 3' },
+  ], []);
+
+  // Generate mesh links between nearby nodes
+  const meshLinks = useMemo(() => [
+    [0, 1], [1, 2], [2, 3], [3, 4], [4, 5],
+    [5, 6], [6, 7], [7, 8], [8, 9], [9, 10],
+    [10, 0], [1, 3], [3, 5], [5, 7], [7, 9],
+    [2, 11], [4, 11], [3, 11],
+  ].map(([i, j]) => [facilities[i], facilities[j]]), [facilities]);
 
   return (
     <section 
@@ -74,118 +161,92 @@ export default function VPoC() {
 
       {/* Visualization */}
       <div className="bg-background/80 rounded-2xl p-6 md:p-8 border border-border/50">
+        {/* Status Banner */}
+        <div className="mb-4 text-center">
+          <div className={`text-sm font-bold mb-1 ${
+            state === 'online' ? 'text-success' :
+            state === 'outage' ? 'text-warning' : 'text-primary'
+          }`}>
+            {stateLabels.title}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {stateLabels.subtitle}
+          </div>
+        </div>
+
         <svg 
-          viewBox="0 0 700 320" 
-          className="w-full h-auto max-h-[400px]"
+          viewBox="0 0 640 420" 
+          className="w-full h-auto max-h-[500px]"
           role="img"
           aria-label={`Network visualization showing ${state} state`}
         >
           {/* Cloud */}
-          <g opacity={cloudVisible ? 1 : 0.15} className="transition-opacity duration-500">
-            <circle cx="600" cy="80" r="40" fill="currentColor" className="text-primary" opacity="0.2" />
-            <circle cx="600" cy="80" r="32" fill="currentColor" className="text-primary" />
+          <g opacity={cloudVisible ? 1 : 0.2} className="transition-opacity duration-1000">
+            <circle cx="580" cy="60" r="45" fill="currentColor" className="text-primary" opacity="0.15" />
+            <circle cx="580" cy="60" r="35" fill="currentColor" className="text-primary" />
+            {state === 'reconnect' && !prefersReduced && (
+              <circle cx="580" cy="60" r="35" fill="none" stroke="currentColor" strokeWidth="2" className="text-success" opacity="0.6">
+                <animate attributeName="r" from="35" to="50" dur="2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" from="0.6" to="0" dur="2s" repeatCount="indefinite" />
+              </circle>
+            )}
             <text 
-              x="600" 
-              y="88" 
+              x="580" 
+              y="68" 
               textAnchor="middle" 
               className="fill-primary-foreground text-sm font-semibold"
             >
               Cloud
             </text>
+            {state === 'reconnect' && (
+              <text x="580" y="100" textAnchor="middle" className="fill-success text-[10px] font-bold">✓</text>
+            )}
           </g>
 
-          {/* Local nodes (healthcare facilities / schools) */}
-          {[
-            { x: 120, y: 240, label: 'Clinic A' },
-            { x: 220, y: 180, label: 'Clinic B' },
-            { x: 300, y: 260, label: 'School' },
-            { x: 400, y: 200, label: 'Clinic C' },
-            { x: 480, y: 250, label: 'Hub' },
-          ].map(({ x, y, label }, i) => (
-            <g key={i}>
-              <circle 
-                cx={x} 
-                cy={y} 
-                r="20" 
-                fill="currentColor" 
-                className="text-success" 
-                opacity="0.2" 
-              />
-              <circle 
-                cx={x} 
-                cy={y} 
-                r="16" 
-                fill="currentColor" 
-                className="text-success"
-              />
-              <text 
-                x={x} 
-                y={y + 5} 
-                textAnchor="middle" 
-                className="fill-success-foreground text-xs font-medium"
+          {/* Mesh links (peer-to-peer connections) */}
+          {meshLinks.map(([n1, n2], i) => {
+            const opacity = state === 'outage' ? 0.8 : 0.4;
+            const strokeColor = state === 'outage' ? 'text-warning' : 
+                               state === 'reconnect' ? 'text-primary' : 'text-success';
+            
+            return (
+              <line
+                key={`mesh-${i}`}
+                x1={n1.x}
+                y1={n1.y}
+                x2={n2.x}
+                y2={n2.y}
+                stroke="currentColor"
+                className={strokeColor}
+                strokeWidth={state === 'outage' ? 3 : 2}
+                opacity={opacity}
+                strokeDasharray={state === 'reconnect' && !prefersReduced ? '6 4' : '0'}
               >
-                {i + 1}
-              </text>
-              <text 
-                x={x} 
-                y={y + 40} 
-                textAnchor="middle" 
-                className="fill-muted-foreground text-xs"
-              >
-                {label}
-              </text>
-            </g>
-          ))}
-
-          {/* Mesh links (local peer-to-peer) */}
-          {[
-            [120, 240, 220, 180],
-            [220, 180, 300, 260],
-            [300, 260, 400, 200],
-            [400, 200, 480, 250],
-            [220, 180, 400, 200],
-            [120, 240, 300, 260],
-          ].map(([x1, y1, x2, y2], i) => (
-            <line
-              key={i}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="currentColor"
-              className="text-success"
-              strokeWidth={3}
-              opacity={0.6}
-              strokeDasharray={state === 'reconnect' && !prefersReduced ? '6 4' : '0'}
-            >
-              {!prefersReduced && state === 'online' && (
-                <animate
-                  attributeName="stroke-dashoffset"
-                  from="0"
-                  to="20"
-                  dur="2s"
-                  repeatCount="indefinite"
-                />
-              )}
-            </line>
-          ))}
+                {!prefersReduced && state === 'outage' && (
+                  <animate
+                    attributeName="opacity"
+                    values={`${opacity};${opacity * 0.5};${opacity}`}
+                    dur="2s"
+                    repeatCount="indefinite"
+                  />
+                )}
+              </line>
+            );
+          })}
 
           {/* Cloud links (from hub nodes to cloud) */}
-          {[
-            [400, 200],
-            [480, 250],
-          ].map(([x, y], i) => (
+          {[facilities[3], facilities[7], facilities[11]].map((facility, i) => (
             <line
-              key={i}
-              x1={x}
-              y1={y}
-              x2={600}
-              y2={80}
+              key={`cloud-link-${i}`}
+              x1={facility.x}
+              y1={facility.y}
+              x2={580}
+              y2={60}
               stroke="currentColor"
               className="text-primary"
               strokeWidth={3}
-              opacity={cloudVisible ? 0.6 : 0.1}
-              strokeDasharray={state === 'online' && !prefersReduced ? '8 6' : '0'}
+              opacity={cloudVisible ? 0.7 : 0.1}
+              strokeDasharray={state === 'online' && !prefersReduced ? '8 6' : state === 'outage' ? '4 4' : '0'}
             >
               {!prefersReduced && state === 'reconnect' && (
                 <animate
@@ -199,48 +260,60 @@ export default function VPoC() {
             </line>
           ))}
 
-          {/* Status indicator */}
-          <g transform="translate(50, 40)">
-            <rect 
-              width="200" 
-              height="60" 
-              rx="8" 
-              fill="currentColor" 
-              className={
-                state === 'online' 
-                  ? 'text-success/20' 
-                  : state === 'outage' 
-                  ? 'text-warning/20' 
-                  : 'text-primary/20'
-              }
-            />
-            <text 
-              x="100" 
-              y="30" 
-              textAnchor="middle" 
-              className={`text-xs font-semibold ${
-                state === 'online' 
-                  ? 'fill-success' 
-                  : state === 'outage' 
-                  ? 'fill-warning' 
-                  : 'fill-primary'
-              }`}
-            >
-              {state === 'online' && 'Mesh + Cloud Active'}
-              {state === 'outage' && 'Mesh Only - Offline'}
-              {state === 'reconnect' && 'Syncing Changes'}
-            </text>
-            <text 
-              x="100" 
-              y="48" 
-              textAnchor="middle" 
-              className="fill-muted-foreground text-[10px]"
-            >
-              {state === 'online' && 'Normal Operation'}
-              {state === 'outage' && 'Zero Data Loss'}
-              {state === 'reconnect' && 'Conflict-Free Merge'}
-            </text>
-          </g>
+          {/* Local facility nodes */}
+          {facilities.map(({ x, y, label }, i) => {
+            const isHub = label.includes('Hub');
+            return (
+              <g key={i}>
+                <circle 
+                  cx={x} 
+                  cy={y} 
+                  r="22" 
+                  fill="currentColor" 
+                  className="text-success" 
+                  opacity="0.15" 
+                />
+                <circle 
+                  cx={x} 
+                  cy={y} 
+                  r="18" 
+                  fill="currentColor" 
+                  className={isHub ? 'text-primary' : 'text-success'}
+                >
+                  {!prefersReduced && state === 'online' && isHub && (
+                    <animate
+                      attributeName="opacity"
+                      values="1;0.6;1"
+                      dur="3s"
+                      repeatCount="indefinite"
+                    />
+                  )}
+                </circle>
+                {state === 'outage' && !prefersReduced && (
+                  <circle cx={x} cy={y} r="18" fill="none" stroke="currentColor" strokeWidth="2" className="text-warning" opacity="0.4">
+                    <animate attributeName="r" from="18" to="28" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" from="0.4" to="0" dur="2s" repeatCount="indefinite" />
+                  </circle>
+                )}
+                <text 
+                  x={x} 
+                  y={y + 5} 
+                  textAnchor="middle" 
+                  className="fill-success-foreground text-xs font-bold"
+                >
+                  {i + 1}
+                </text>
+                <text 
+                  x={x} 
+                  y={y + 38} 
+                  textAnchor="middle" 
+                  className="fill-muted-foreground text-[10px]"
+                >
+                  {label}
+                </text>
+              </g>
+            );
+          })}
         </svg>
 
         {/* State description */}
@@ -270,11 +343,71 @@ export default function VPoC() {
           </p>
         </div>
 
+        {/* Control Bar */}
+        <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/50 rounded-lg border border-border">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={previousState}
+              className="p-2 rounded-lg bg-background hover:bg-primary/10 border border-border transition-colors"
+              aria-label="Previous state"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setIsPaused(!isPaused)}
+              className="p-2 rounded-lg bg-background hover:bg-primary/10 border border-border transition-colors"
+              aria-label={isPaused ? 'Play' : 'Pause'}
+            >
+              {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={advanceState}
+              className="p-2 rounded-lg bg-background hover:bg-primary/10 border border-border transition-colors"
+              aria-label="Next state"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <button
+              onClick={resetToOnline}
+              className="p-2 rounded-lg bg-background hover:bg-primary/10 border border-border transition-colors"
+              aria-label="Reset to online"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="flex-1 max-w-md">
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`text-xs font-medium ${
+                state === 'online' ? 'text-success' :
+                state === 'outage' ? 'text-warning' : 'text-primary'
+              }`}>
+                {state === 'online' ? '● Online' :
+                 state === 'outage' ? '● Outage' : '● Reconnect'}
+              </span>
+            </div>
+            <div className="w-full h-1.5 bg-background rounded-full overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-100 ${
+                  state === 'online' ? 'bg-success' :
+                  state === 'outage' ? 'bg-warning' : 'bg-primary'
+                }`}
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="text-xs text-muted-foreground text-center">
+            Press <kbd className="px-1.5 py-0.5 bg-background rounded text-foreground text-[10px]">Space</kbd> to pause
+          </div>
+        </div>
+
         {/* Keyboard hint */}
         <div className="mt-4 text-xs text-muted-foreground text-center md:text-left">
-          💡 Pro tip: Press <kbd className="px-2 py-1 bg-muted rounded text-foreground">1</kbd>,{' '}
-          <kbd className="px-2 py-1 bg-muted rounded text-foreground">2</kbd>, or{' '}
-          <kbd className="px-2 py-1 bg-muted rounded text-foreground">3</kbd> to toggle states
+          💡 Keyboard shortcuts: <kbd className="px-2 py-1 bg-muted rounded text-foreground">1</kbd>,{' '}
+          <kbd className="px-2 py-1 bg-muted rounded text-foreground">2</kbd>,{' '}
+          <kbd className="px-2 py-1 bg-muted rounded text-foreground">3</kbd> to jump to states
         </div>
       </div>
 

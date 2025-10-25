@@ -1,0 +1,136 @@
+{
+  "caseStudies": [
+    {
+      "id": "healthcare-cyclone-beti",
+      "industry": "Healthcare",
+      "region": "Sub-Saharan Africa",
+      "partner": "Ministry of Health, Regional District",
+      "challenge": "Cyclone Beti severed internet connectivity for 14 days across 12 rural health districts. Cloud-dependent EMR systems became inaccessible, threatening continuity of care for 24,000 patients.",
+      "solution": "GrahmOS offline-first deployment with mesh networking enabled clinics to maintain full EMR access, coordinate patient transfers, and manage emergency protocols without internet connectivity.",
+      "results": {
+        "summary": "Zero downtime, zero data loss, 2,400 critical patients served during outage",
+        "details": [
+          "99.9% system uptime maintained throughout 14-day outage",
+          "2,400 patients received uninterrupted care during crisis period",
+          "847 medical records updated and synced conflict-free upon reconnection",
+          "3 emergency patient transfers coordinated via mesh network",
+          "Zero HIPAA compliance incidents or data breaches",
+          "Full EMR functionality maintained without internet access"
+        ]
+      },
+      "metrics": [
+        {
+          "value": "99.9%",
+          "label": "Uptime During Crisis",
+          "type": "percentage"
+        },
+        {
+          "value": "14 days",
+          "label": "Offline Operation",
+          "type": "time"
+        },
+        {
+          "value": "0",
+          "label": "Data Loss Events",
+          "type": "count"
+        },
+        {
+          "value": "2,400",
+          "label": "Patients Served",
+          "type": "count"
+        }
+      ],
+      "quote": "For the first time, our medical teams could focus on patients instead of worrying whether their systems would work. GrahmOS proved that rural healthcare can be as reliable as urban centers.",
+      "quoteAttribution": "Dr. Amara Okonkwo, Regional Health Director",
+      "ctaLink": "/case-studies"
+    },
+    {
+      "id": "education-bandwidth-constrained",
+      "industry": "Education",
+      "region": "Southeast Asia",
+      "partner": "Ministry of Education, Provincial Network",
+      "challenge": "Intermittent internet (62% average uptime) caused 8+ hours of lost learning time weekly for 12,000 students. Cloud-based LMS platforms frequently crashed during peak hours.",
+      "solution": "GrahmOS offline-first LMS deployment across 8 schools with automatic night-time synchronization, enabling full curriculum access regardless of connectivity status.",
+      "results": {
+        "summary": "99.7% uptime, 60% bandwidth cost reduction, 340 teachers empowered",
+        "details": [
+          "Uptime increased from 62% to 99.7%",
+          "8+ hours of weekly learning time recovered per student",
+          "Bandwidth costs reduced from $8,400/month to $3,200/month",
+          "340 teachers managing 12,000 students seamlessly",
+          "Shared resource library across 8 schools (7,200+ assets)",
+          "Automatic conflict-free sync during off-peak hours"
+        ]
+      },
+      "metrics": [
+        {
+          "value": "99.7%",
+          "label": "System Uptime",
+          "type": "percentage"
+        },
+        {
+          "value": "60%",
+          "label": "Cost Reduction",
+          "type": "percentage"
+        },
+        {
+          "value": "12,000",
+          "label": "Students Served",
+          "type": "count"
+        },
+        {
+          "value": "8 hrs",
+          "label": "Learning Time Recovered Weekly",
+          "type": "time"
+        }
+      ],
+      "quote": "Every child deserves access to learning, regardless of where they live. GrahmOS made that promise a reality for our district.",
+      "quoteAttribution": "Nurul Hasan, District Education Coordinator",
+      "ctaLink": "/case-studies"
+    },
+    {
+      "id": "commerce-infrastructure-crisis",
+      "industry": "Commerce",
+      "region": "Eastern Europe",
+      "partner": "Community Marketplace Collective",
+      "challenge": "National fiber cut affected payment systems, inventory management, and customer communications for 50 small businesses across 3 regions during peak shopping season.",
+      "solution": "GrahmOS community commerce platform with offline transaction ledger, mesh-based payments, and automatic reconciliation upon connectivity restoration.",
+      "results": {
+        "summary": "$47,000 in offline transactions, zero fraud, seamless reconciliation",
+        "details": [
+          "$47,000 in transactions processed offline over 2 weeks",
+          "Zero fraudulent transactions detected",
+          "1,247 unique customers served without internet",
+          "Inventory synchronized across 50 merchants via mesh",
+          "All transactions reconciled in 47 seconds upon reconnection",
+          "Local economic activity maintained at 94% of pre-outage levels"
+        ]
+      },
+      "metrics": [
+        {
+          "value": "$47K",
+          "label": "Offline Revenue",
+          "type": "cost"
+        },
+        {
+          "value": "0",
+          "label": "Fraud Incidents",
+          "type": "count"
+        },
+        {
+          "value": "50",
+          "label": "Businesses Protected",
+          "type": "count"
+        },
+        {
+          "value": "47 sec",
+          "label": "Reconciliation Time",
+          "type": "time"
+        }
+      ],
+      "quote": "Our businesses didn't stop when Big Tech's infrastructure failed. We proved that local economies can thrive with technology we control.",
+      "quoteAttribution": "Elena Petrov, Marketplace Cooperative Director",
+      "ctaLink": "/case-studies"
+    }
+  ]
+}

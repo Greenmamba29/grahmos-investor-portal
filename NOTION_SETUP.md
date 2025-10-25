@@ -23,7 +23,14 @@ The investor portal now uses **Notion as the database** instead of PostgreSQL. T
 5. Copy the **Internal Integration Token** (starts with `secret_`)
 6. Save this token securely - you'll need it for `NOTION_API_KEY`
 
-## Step 2: Create the User Database
+## Step 2: Create Required Databases
+
+You'll need to create **three Notion databases** for the full system:
+1. **Users Database** (authentication)
+2. **Investor Documents Database** (document library - optional but recommended)
+3. **Announcements Database** (future enhancement)
+
+### 2.1: Create the Users Database
 
 1. Create a new **full-page database** in Notion
 2. Name it **"GrahmOS Users"** or similar
@@ -51,7 +58,59 @@ The investor portal now uses **Notion as the database** instead of PostgreSQL. T
    - Add options: `user`, `waitlist`, `investor`, `admin`
 7. **Created At**: Add property → Select "Date" type
 
-## Step 3: Share Database with Integration
+### 2.2: Create the Investor Documents Database (Optional - Document Library Feature)
+
+1. Create a new **full-page database** in Notion
+2. Name it **"Investor Documents"** or similar
+3. Configure the database with the following properties:
+
+| Property Name | Property Type | Options/Notes |
+|--------------|---------------|---------------|
+| **Document Title** | Title | Display name of the document |
+| **Category** | Select | Options: `Financial`, `Legal`, `Product`, `Market`, `Other` |
+| **File URL** | URL | Link to the actual PDF/document file |
+| **Description** | Text | Brief summary of the document |
+| **Upload Date** | Date | When the document was added |
+| **Access Level** | Select | Options: `All`, `Investor`, `Admin` |
+| **Status** | Select | Options: `Active`, `Archived`, `Draft` |
+| **Tags** | Multi-select | Custom tags (e.g., `Q4-2025`, `Due-Diligence`) |
+| **File Size** | Text | Optional - e.g., "2.4 MB" |
+| **File Type** | Select | Options: `PDF`, `XLSX`, `DOCX`, `Other` |
+
+**Setup Instructions:**
+1. Add each property as listed above
+2. For Select properties, add the specified options
+3. Share this database with your integration (same as Users database)
+4. Get the database ID and add it to `VITE_INVESTOR_DOCS_DATABASE_ID`
+
+**Adding Documents:**
+1. Create a new page in the database
+2. Set Document Title (e.g., "Q4 2024 Financial Report")
+3. Select Category (e.g., "Financial")
+4. Add File URL (upload file to Notion, Google Drive, or Dropbox and paste link)
+5. Add Description
+6. Set Upload Date to today
+7. Set Access Level to "Investor" (or "All" for public docs)
+8. Set Status to "Active"
+9. Add relevant Tags
+10. Optional: Add File Size and File Type
+
+### 2.3: Create the Announcements Database (Future Enhancement)
+
+**Coming Soon** - This database powers a news feed in the investor portal.
+
+| Property Name | Property Type | Options |
+|--------------|---------------|---------------|
+| **Title** | Title | Announcement headline |
+| **Content** | Text (rich) | Full announcement body |
+| **Type** | Select | `Product Update`, `Financial`, `Press Release`, `Milestone` |
+| **Published Date** | Date | When to show |
+| **Priority** | Select | `High`, `Normal`, `Low` |
+| **Target Audience** | Multi-select | `All`, `Investors`, `Admins` |
+| **Thumbnail URL** | URL | Optional image |
+| **Status** | Select | `Published`, `Draft`, `Scheduled` |
+
+## Step 3: Share Databases with Integration
 
 1. Open your **GrahmOS Users** database in Notion
 2. Click the **"..." menu** in the top right
@@ -82,11 +141,17 @@ The investor portal now uses **Notion as the database** instead of PostgreSQL. T
 Create or update your `.env` file:
 
 ```bash
-# Notion Configuration
+# Notion Configuration - Users Database (Required)
 VITE_NOTION_API_KEY=secret_your_notion_integration_token_here
 VITE_NOTION_DATABASE_ID=your_32_character_database_id_here
 NOTION_API_KEY=secret_your_notion_integration_token_here
 NOTION_DATABASE_ID=your_32_character_database_id_here
+
+# Notion Configuration - Investor Documents (Optional but Recommended)
+VITE_INVESTOR_DOCS_DATABASE_ID=your_documents_database_id_here
+
+# Notion Configuration - Announcements (Future Enhancement)
+# VITE_ANNOUNCEMENTS_DATABASE_ID=your_announcements_database_id_here
 
 # Keep other existing variables
 SESSION_SECRET=your-strong-random-secret-key-here

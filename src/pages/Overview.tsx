@@ -5,6 +5,8 @@ import { ArrowRight, Heart, Shield, Users, CheckCircle2, TrendingUp, Building2, 
 import { Link } from 'react-router-dom';
 import VPoC from '@/components/VPoC';
 import EmailSignup from '@/components/EmailSignup';
+import CaseStudyCard from '@/components/CaseStudyCard';
+import caseStudiesData from '@/data/caseStudies.json';
 
 export default function Overview() {
   return (
@@ -176,121 +178,10 @@ export default function Overview() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Case Study 1: Healthcare */}
-            <Card className="investor-card group hover:border-primary/50 transition-all">
-              <CardContent className="p-8">
-                <div className="mb-6">
-                  <Badge className="mb-4 bg-success/10 text-success border-success/30">Healthcare</Badge>
-                  <h3 className="text-2xl font-bold mb-3">
-                    Kept 12 health districts operating during 14-day blackout (99.9% uptime)
-                  </h3>
-                </div>
-
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <p className="text-sm font-semibold text-primary mb-1">Context</p>
-                    <p className="text-muted-foreground">Cyclone Beti, rural clinics across 50km radius</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-primary mb-1">Problem</p>
-                    <p className="text-muted-foreground">Complete internet blackout; risk of data loss and service interruption</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-primary mb-1">Solution</p>
-                    <p className="text-muted-foreground">GrahmOS local directories + mesh sync; conflict-free merges</p>
-                  </div>
-                </div>
-
-                <div className="bg-card/50 rounded-lg p-4 mb-6 border border-border/50">
-                  <p className="text-sm font-semibold mb-3">Results</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-2xl font-bold text-success">99.9%</div>
-                      <div className="text-xs text-muted-foreground">Uptime</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-success">2,400</div>
-                      <div className="text-xs text-muted-foreground">Patients Served</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-success">14</div>
-                      <div className="text-xs text-muted-foreground">Days Offline</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-success">0</div>
-                      <div className="text-xs text-muted-foreground">Data Loss</div>
-                    </div>
-                  </div>
-                </div>
-
-                <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground mb-6">
-                  "For the first time, disaster didn't mean healthcare shutdown. GrahmOS kept us running."
-                  <footer className="text-sm mt-2 not-italic">— Regional Health Director</footer>
-                </blockquote>
-
-                <Button variant="outline" className="w-full" asChild>
-                  <a href="/stories/healthcare-cyclone-beti">Read full case →</a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Case Study 2: Education */}
-            <Card className="investor-card group hover:border-primary/50 transition-all">
-              <CardContent className="p-8">
-                <div className="mb-6">
-                  <Badge className="mb-4 bg-primary/10 text-primary border-primary/30">Education</Badge>
-                  <h3 className="text-2xl font-bold mb-3">
-                    Ministry of Education deployment: 99.7% uptime serving 12,000 students
-                  </h3>
-                </div>
-
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <p className="text-sm font-semibold text-primary mb-1">Context</p>
-                    <p className="text-muted-foreground">Sub-Saharan district, 8 schools, bandwidth-constrained region</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-primary mb-1">Problem</p>
-                    <p className="text-muted-foreground">Unreliable internet (40% downtime); students lost 8+ hours learning weekly</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-primary mb-1">Solution</p>
-                    <p className="text-muted-foreground">GrahmOS offline-first LMS; automatic night-time syncs</p>
-                  </div>
-                </div>
-
-                <div className="bg-card/50 rounded-lg p-4 mb-6 border border-border/50">
-                  <p className="text-sm font-semibold mb-3">Results</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-2xl font-bold text-primary">99.7%</div>
-                      <div className="text-xs text-muted-foreground">Uptime (vs 62%)</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-primary">12,000</div>
-                      <div className="text-xs text-muted-foreground">Students</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-primary">340</div>
-                      <div className="text-xs text-muted-foreground">Teachers</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-primary">-60%</div>
-                      <div className="text-xs text-muted-foreground">Bandwidth Cost</div>
-                    </div>
-                  </div>
-                </div>
-
-                <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground mb-6">
-                  "For the first time, connectivity doesn't determine whether our children can learn."
-                  <footer className="text-sm mt-2 not-italic">— District Education Director</footer>
-                </blockquote>
-
-                <Button variant="outline" className="w-full" asChild>
-                  <a href="/stories/education-ministry">Read full case →</a>
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Render first two case studies: Healthcare and Education */}
+            {caseStudiesData.caseStudies.slice(0, 2).map((study) => (
+              <CaseStudyCard key={study.id} {...study} />
+            ))}
           </div>
         </div>
       </section>
