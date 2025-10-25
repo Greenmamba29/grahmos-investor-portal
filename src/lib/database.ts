@@ -15,8 +15,7 @@ const getDatabaseUrl = (): string => {
   } else if (import.meta.env?.DATABASE_URL) {
     databaseUrl = import.meta.env.DATABASE_URL;
   } else {
-    // Fallback to the actual configured URL from your .env
-    databaseUrl = 'postgresql://grahmos_user:9sLk7!pQx@db.grahmos.info:5432/grahmos_investor';
+    throw new Error('DATABASE_URL or VITE_DATABASE_URL environment variable must be set');
   }
   
   console.log('🔧 Using database URL:', databaseUrl.replace(/:\/\/.*@/, '://***:***@')); // Hide credentials in logs

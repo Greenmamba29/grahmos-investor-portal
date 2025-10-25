@@ -1,18 +1,6 @@
-import { dbOperations, createTables } from './schema';
-import { connectToDatabase } from './database';
+import { notionOperations } from './notion';
 
-// Initialize database tables on first run
-let tablesInitialized = false;
-
-const initializeDatabase = async () => {
-  if (!tablesInitialized) {
-    const connected = await connectToDatabase();
-    if (connected) {
-      await createTables();
-      tablesInitialized = true;
-    }
-  }
-};
+// Notion is always available, no initialization needed
 
 // API functions
 export const api = {
@@ -24,10 +12,8 @@ export const api = {
     signupSource?: string;
   }) {
     try {
-      await initializeDatabase();
-      
-      // Add to newsletter
-      const result = await dbOperations.addToNewsletter({
+      // Add to newsletter via Notion
+      const result = await notionOperations.addToNewsletter({
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -86,26 +72,14 @@ export const api = {
     userType?: string;
   }) {
     try {
-      await initializeDatabase();
-      
-      // Create user account
-      const result = await dbOperations.createUser({
+      // Create user account via Notion
+      const result = await notionOperations.createUser({
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
-        passwordHash: data.password ? await hashPassword(data.password) : undefined,
+        password: data.password ? await hashPassword(data.password) : undefined,
         userType: data.userType || 'user'
       });
-
-      // Also add to newsletter if not investor
-      if (data.userType !== 'investor') {
-        await dbOperations.addToNewsletter({
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          signupSource: 'registration'
-        });
-      }
 
       return {
         success: true,
@@ -158,24 +132,15 @@ export const api = {
     companyName?: string;
   }) {
     try {
-      await initializeDatabase();
-      
-      // Create investor account
-      const result = await dbOperations.createUser({
+      // Create investor account via Notion
+      const result = await notionOperations.createUser({
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
-        passwordHash: data.password ? await hashPassword(data.password) : undefined,
-        userType: 'investor'
+        password: data.password ? await hashPassword(data.password) : undefined,
+        userType: 'investor',
+        role: 'investor'
       });
-
-      // Create investor profile
-      if (data.companyName && result.id) {
-        await dbOperations.createInvestorProfile({
-          userId: result.id,
-          companyName: data.companyName
-        });
-      }
 
       return {
         success: true,
@@ -204,9 +169,7 @@ export const api = {
   // User login with proper password verification
   async loginUser(email: string, password: string) {
     try {
-      await initializeDatabase();
-      
-      const user = await dbOperations.getUserByEmailWithPassword(email);
+      const user = await notionOperations.getUserByEmail(email);
       if (!user) {
         return {
           success: false,
@@ -216,7 +179,7 @@ export const api = {
       }
 
       // Verify the password
-      if (!user.password_hash || !(await verifyPassword(password, user.password_hash))) {
+      if (!user.password || !(await verifyPassword(password, user.password))) {
         return {
           success: false,
           error: 'Invalid credentials',
@@ -229,9 +192,9 @@ export const api = {
         data: {
           id: user.id,
           email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          userType: user.user_type
+          firstName: user.firstName,
+          lastName: user.lastName,
+          userType: user.userType
         },
         message: 'Login successful'
       };
@@ -245,14 +208,14 @@ export const api = {
     }
   },
 
-  // Get signup statistics
+  // Get signup statistics (Notion doesn't have aggregates easily, simplified)
   async getStats() {
     try {
-      await initializeDatabase();
-      const stats = await dbOperations.getSignupStats();
+      // For now, return placeholder stats
+      // In production, you'd query the Notion database and count entries
       return {
         success: true,
-        data: stats
+        data: { totalUsers: 0, totalNewsletterSignups: 0 }
       };
     } catch (error) {
       console.error('Stats error:', error);
@@ -267,15 +230,14 @@ export const api = {
   // Check if user exists
   async checkUserExists(email: string) {
     try {
-      await initializeDatabase();
-      const user = await dbOperations.getUserByEmail(email);
+      const user = await notionOperations.getUserByEmail(email);
       return {
         success: true,
         exists: !!user,
         data: user ? { 
           email: user.email, 
-          firstName: user.first_name,
-          userType: user.user_type 
+          firstName: user.firstName,
+          userType: user.userType 
         } : null
       };
     } catch (error) {

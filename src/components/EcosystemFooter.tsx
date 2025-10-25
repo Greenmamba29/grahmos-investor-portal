@@ -1,8 +1,42 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 
 export function EcosystemFooter() {
   const currentYear = new Date().getFullYear();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.querySelector(sectionId);
+    if (element) {
+      const yOffset = -80;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      
+      // Auto-focus for newsletter
+      if (sectionId === '#newsletter') {
+        setTimeout(() => {
+          const emailInput = element.querySelector('input[type="email"]') as HTMLInputElement;
+          emailInput?.focus();
+        }, 500);
+      }
+    }
+  };
+
+  const handleSectionClick = (e: React.MouseEvent, sectionId: string) => {
+    e.preventDefault();
+    
+    if (location.pathname === '/') {
+      // Already on homepage, just scroll
+      scrollToSection(sectionId);
+    } else {
+      // Navigate to homepage first, then scroll
+      navigate('/');
+      setTimeout(() => {
+        scrollToSection(sectionId);
+      }, 100);
+    }
+  };
 
   return (
     <footer className="border-t border-border/50 bg-card/30 mt-24">
@@ -58,15 +92,7 @@ export function EcosystemFooter() {
               <li>
                 <a 
                   href="#how-it-works" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.querySelector('#how-it-works');
-                    if (element) {
-                      const yOffset = -80;
-                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                      window.scrollTo({ top: y, behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={(e) => handleSectionClick(e, '#how-it-works')}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   How It Works
@@ -75,15 +101,7 @@ export function EcosystemFooter() {
               <li>
                 <a 
                   href="#principles" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.querySelector('#principles');
-                    if (element) {
-                      const yOffset = -80;
-                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                      window.scrollTo({ top: y, behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={(e) => handleSectionClick(e, '#principles')}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   Principles
@@ -92,15 +110,7 @@ export function EcosystemFooter() {
               <li>
                 <a 
                   href="#stories" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.querySelector('#stories');
-                    if (element) {
-                      const yOffset = -80;
-                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                      window.scrollTo({ top: y, behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={(e) => handleSectionClick(e, '#stories')}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   Stories
@@ -135,20 +145,7 @@ export function EcosystemFooter() {
               <li>
                 <a 
                   href="#newsletter" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const element = document.querySelector('#newsletter');
-                    if (element) {
-                      const yOffset = -80;
-                      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                      window.scrollTo({ top: y, behavior: 'smooth' });
-                      // Focus on email input
-                      setTimeout(() => {
-                        const emailInput = element.querySelector('input[type="email"]') as HTMLInputElement;
-                        emailInput?.focus();
-                      }, 500);
-                    }
-                  }}
+                  onClick={(e) => handleSectionClick(e, '#newsletter')}
                   className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   Join the Newsletter

@@ -39,7 +39,7 @@ function syncEnvironmentVariables() {
     const envContent = readFileSync('.env', 'utf8');
     const envVars = {};
     
-    envContent.split('\\n').forEach(line => {
+    envContent.split('\n').forEach(line => {
       const [key, ...valueParts] = line.split('=');
       if (key && valueParts.length > 0) {
         const value = valueParts.join('=').trim();
@@ -120,7 +120,7 @@ async function validateDeployment() {
   try {
     // Get site URL
     const status = execSync('netlify status', { encoding: 'utf8' });
-    const urlMatch = status.match(/Project URL:\\s+(https:\\/\\/[^\\s]+)/);
+    const urlMatch = status.match(/Project URL:\s+(https:\/\/[^\s]+)/);
     const siteUrl = urlMatch ? urlMatch[1] : 'https://grahmos.info';
     
     console.log(`🌐 Testing site availability: ${siteUrl}`);
@@ -153,28 +153,28 @@ async function deploy() {
   
   try {
     // Step 1: Environment Validation
-    console.log('\\n📋 Step 1: Environment Variable Validation');
+    console.log('\n📋 Step 1: Environment Variable Validation');
     validateEnvironmentVariables();
     
     // Step 2: Netlify CLI Check
-    console.log('\\n🔐 Step 2: Netlify Authentication Check');
+    console.log('\n🔐 Step 2: Netlify Authentication Check');
     if (!checkNetlifyAuth()) {
       process.exit(1);
     }
     
     // Step 3: Sync Environment Variables
-    console.log('\\n🔄 Step 3: Environment Variable Sync');
+    console.log('\n🔄 Step 3: Environment Variable Sync');
     syncEnvironmentVariables();
     
     // Step 4: Database Connection Test
-    console.log('\\n🗄️  Step 4: Database Connection Test');
+    console.log('\n🗄️  Step 4: Database Connection Test');
     const dbConnected = await testDatabaseConnection();
     if (!dbConnected) {
       console.log('⚠️  Database connection failed, but continuing with deployment...');
     }
     
     // Step 5: Deploy
-    console.log('\\n🚀 Step 5: Deploy to Netlify');
+    console.log('\n🚀 Step 5: Deploy to Netlify');
     const deploySuccess = await deployToNetlify();
     if (!deploySuccess) {
       console.error('🛑 Deployment failed, aborting...');
@@ -182,24 +182,24 @@ async function deploy() {
     }
     
     // Step 6: Post-deployment Validation
-    console.log('\\n✅ Step 6: Post-deployment Validation');
+    console.log('\n✅ Step 6: Post-deployment Validation');
     await validateDeployment();
     
     // Success Summary
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    console.log('\\n🎉 DEPLOYMENT COMPLETED SUCCESSFULLY!');
+    console.log('\n🎉 DEPLOYMENT COMPLETED SUCCESSFULLY!');
     console.log(`⏱️  Total time: ${duration} seconds`);
     console.log('🌐 Site: https://grahmos.info');
     console.log('📊 Admin: https://app.netlify.com/sites/grahmos-investor');
-    console.log('\\n🔍 Next steps:');
+    console.log('\n🔍 Next steps:');
     console.log('1. Test authentication signup/login flow');
     console.log('2. Verify database operations are working');
     console.log('3. Check Stack Auth webhook integration');
     
   } catch (error) {
-    console.error('\\n💥 DEPLOYMENT FAILED');
+    console.error('\n💥 DEPLOYMENT FAILED');
     console.error('Error:', error.message);
-    console.error('\\n🛠️  Troubleshooting steps:');
+    console.error('\n🛠️  Troubleshooting steps:');
     console.error('1. Check environment variables: npm run validate-env');
     console.error('2. Test database connection: node test-database-connection.js');
     console.error('3. Verify Netlify authentication: netlify status');

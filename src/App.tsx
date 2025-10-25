@@ -191,6 +191,11 @@ const App = () => {
                 <Route path="/team" element={<Layout><Team /></Layout>} />
                 <Route path="/investor-relations" element={<Layout><InvestorRelations /></Layout>} />
                 <Route path="/partners" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Partners</h1><p className="text-xl text-muted-foreground">Partnership page coming soon. Contact partners@grahmos.info</p></div></div></Layout>} />
+                <Route path="/manifesto" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Manifesto</h1><p className="text-xl text-muted-foreground">Coming soon</p></div></div></Layout>} />
+                <Route path="/press" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Press Kit</h1><p className="text-xl text-muted-foreground">Coming soon</p></div></div></Layout>} />
+                <Route path="/privacy" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Privacy Policy</h1><p className="text-xl text-muted-foreground">Coming soon</p></div></div></Layout>} />
+                <Route path="/terms" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Terms of Service</h1><p className="text-xl text-muted-foreground">Coming soon</p></div></div></Layout>} />
+                <Route path="/security" element={<Layout><div className="min-h-screen py-16 px-4"><div className="max-w-4xl mx-auto text-center"><h1 className="text-4xl font-bold mb-4">Security</h1><p className="text-xl text-muted-foreground">Coming soon</p></div></div></Layout>} />
                 
                 {/* Auth routes (no layout) */}
                 <Route path="/auth" element={<Auth />} />

@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { json } from './_db';
+import { json, notionOperations } from './_notion';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -18,10 +18,9 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const { dbOperations } = await import('../../src/lib/schema');
     const { authUtils } = await import('../../src/lib/auth');
     
-    const { email, password, fullName, role } = JSON.parse(event.body || '{}');
+    const { email, password, fullName, firstName, lastName, role } = JSON.parse(event.body || '{}');
 
     if (!email || !password) {
       return json(400, { 
@@ -37,7 +36,7 @@ export const handler: Handler = async (event) => {
       });
     }
 
-    const existingUser = await dbOperations.getUserByEmail(email);
+    const existingUser = await notionOperations.getUserByEmail(email);
     if (existingUser) {
       return json(409, {
         error: 'Email already registered',
@@ -48,15 +47,16 @@ export const handler: Handler = async (event) => {
     const bcrypt = await import('bcryptjs');
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // Use provided firstName/lastName or parse from fullName
     const nameParts = (fullName || '').split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    const userFirstName = firstName || nameParts[0] || '';
+    const userLastName = lastName || nameParts.slice(1).join(' ') || '';
 
-    const user = await dbOperations.createUser({
+    const user = await notionOperations.createUser({
       email,
-      firstName,
-      lastName,
-      passwordHash,
+      firstName: userFirstName,
+      lastName: userLastName,
+      password: passwordHash,
       userType: role || 'standard',
       role: role === 'investor' ? 'investor' : 'standard'
     });
@@ -64,10 +64,10 @@ export const handler: Handler = async (event) => {
     const userSession = {
       id: user.id,
       email: user.email,
-      firstName: user.first_name,
-      lastName: user.last_name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       role: user.role,
-      userType: user.user_type
+      userType: user.userType
     };
 
     const token = authUtils.generateToken(userSession);

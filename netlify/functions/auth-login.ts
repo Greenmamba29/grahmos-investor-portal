@@ -1,5 +1,5 @@
 import type { Handler } from '@netlify/functions';
-import { json } from './_db';
+import { json, notionOperations } from './_notion';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -18,7 +18,6 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const { dbOperations } = await import('../../src/lib/schema');
     const { authUtils } = await import('../../src/lib/auth');
     
     const { email, password } = JSON.parse(event.body || '{}');
@@ -30,7 +29,7 @@ export const handler: Handler = async (event) => {
       });
     }
 
-    const user = await dbOperations.getUserByEmailWithPassword(email);
+    const user = await notionOperations.getUserByEmail(email);
     if (!user) {
       return json(401, {
         error: 'Invalid credentials',
@@ -39,7 +38,7 @@ export const handler: Handler = async (event) => {
     }
 
     const bcrypt = await import('bcryptjs');
-    const isValidPassword = await bcrypt.compare(password, user.password_hash || '');
+    const isValidPassword = await bcrypt.compare(password, user.password || '');
     
     if (!isValidPassword) {
       return json(401, {
@@ -51,10 +50,10 @@ export const handler: Handler = async (event) => {
     const userSession = {
       id: user.id,
       email: user.email,
-      firstName: user.first_name,
-      lastName: user.last_name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       role: user.role,
-      userType: user.user_type
+      userType: user.userType
     };
 
     const token = authUtils.generateToken(userSession);

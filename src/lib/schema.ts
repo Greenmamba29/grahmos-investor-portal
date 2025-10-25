@@ -1,9 +1,10 @@
 import { neon } from '@neondatabase/serverless';
 
 // Use the same database connection pattern as Netlify functions
-const neonConnectionString = process.env.DATABASE_URL || 
-  process.env.NEON_DATABASE_URL || 
-  `postgresql://neondb_owner:npg_ENQYfp57iyKU@ep-icy-breeze-ae05c0wt-pooler.c-2.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require`;
+if (!process.env.DATABASE_URL && !process.env.NEON_DATABASE_URL) {
+  throw new Error('DATABASE_URL or NEON_DATABASE_URL environment variable must be set');
+}
+const neonConnectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || '';
 const sql = neon(neonConnectionString);
 
 // Database schema creation
@@ -75,7 +76,7 @@ export const createTables = async () => {
     await sql`
       CREATE TABLE IF NOT EXISTS investor_applications (
         id SERIAL PRIMARY KEY,
-        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
         pitch TEXT,
         accreditation BOOLEAN DEFAULT FALSE,
         status VARCHAR(20) NOT NULL DEFAULT 'pending',
@@ -112,9 +113,12 @@ export const createTables = async () => {
 
     // Create indexes for better performance
     await sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_signups(email)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_sessions_token ON portal_sessions(session_token)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_sessions_user ON portal_sessions(user_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_investor_applications_status ON investor_applications(status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_investor_applications_user ON investor_applications(user_id)`;
 
     console.log('✅ Database tables created successfully');
     return true;
