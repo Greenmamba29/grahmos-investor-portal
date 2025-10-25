@@ -1,15 +1,16 @@
 # GrahmOS Investor Portal
 
-🚀 **V1.0.0 - Source of Truth Authentication System for GRAHMOS Ecosystem**
+🚀 **V2.0.0 - Simplified Notion-Based Authentication System**
 
-The official investor portal and authentication hub for the GRAHMOS ecosystem (.info, .store, .com, .net, .io). This V1 release serves as the foundation for unified authentication, real-time company progress updates, and investor access across all GRAHMOS domains.
+The official investor portal and authentication hub for the GRAHMOS ecosystem (.info, .store, .com, .net, .io). This V2 release simplifies the architecture by using **Notion as the database**, making setup and management easier while maintaining all V1 features.
 
 ## 🏷️ **Version Information**
-- **Current Version**: V1.0.0 (Tagged: `v1.0.0`)
-- **Release Date**: August 21, 2025
+- **Current Version**: V2.0.0 (Notion-based)
+- **Release Date**: January 2025
 - **Status**: Production Ready ✅
 - **Live Site**: [https://grahmos.info](https://grahmos.info)
 - **Purpose**: Source of truth for GRAHMOS ecosystem authentication
+- **Database**: Notion (replaces PostgreSQL)
 
 ## 🌟 **V1 Key Features**
 
@@ -17,9 +18,10 @@ The official investor portal and authentication hub for the GRAHMOS ecosystem (.
 - Complete signup/login/logout flow with JWT tokens
 - Password reset with secure token-based system
 - Role-based access control (Admin, Investor, Standard, Pending)
-- Database-backed user management with Neon PostgreSQL
+- **Notion database** for user management (simplified from PostgreSQL)
 - Email notifications for registrations and approvals
 - Session management with secure cookies
+- Easy user management through Notion's interface
 
 ### 🏢 **Company Progress Hub** 
 - Real-time updates on GRAHMOS development progress
@@ -169,9 +171,9 @@ npm run dev
 
 ### **Backend & Database**
 - **Netlify Functions** - Serverless API endpoints
-- **Neon PostgreSQL** - Cloud database
+- **Notion API** - Database and user management
 - **JWT Tokens** - Session management
-- **bcrypt** - Password hashing
+- **bcrypt** - Password hashing (12 rounds)
 - **Email Service** - Automated notifications
 
 ### **Authentication & Security**
@@ -187,9 +189,44 @@ npm run dev
 - **Environment Variables** - Configuration management
 - **Error Boundaries** - Graceful error handling
 
+## 📊 **Notion Database Setup**
+
+This project uses **Notion as the database** for user management. See [NOTION_SETUP.md](./NOTION_SETUP.md) for detailed setup instructions.
+
+### Quick Setup
+
+1. **Create a Notion Integration**:
+   - Go to https://www.notion.so/my-integrations
+   - Create a new integration and get the API token
+
+2. **Create a Notion Database**:
+   - Create a full-page database in Notion
+   - Add required properties: Email, First Name, Last Name, Password, Role, User Type, Created At
+   - Share the database with your integration
+
+3. **Configure Environment Variables**:
+   ```bash
+   NOTION_API_KEY=secret_your_token_here
+   NOTION_DATABASE_ID=your_database_id_here
+   VITE_NOTION_API_KEY=secret_your_token_here
+   VITE_NOTION_DATABASE_ID=your_database_id_here
+   ```
+
+4. **Test the Setup**:
+   ```bash
+   npm run dev
+   ```
+
+For complete instructions, see [NOTION_SETUP.md](./NOTION_SETUP.md).
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/c058a360-7fc4-4b60-b164-9c8e700d0dfa) and click on Share -> Publish.
+
+**Important**: Before deploying, make sure to:
+1. Set up your Notion database (see above)
+2. Add Notion environment variables in Netlify dashboard
+3. Test authentication locally first
 
 ## Can I connect a custom domain to my Lovable project?
 
