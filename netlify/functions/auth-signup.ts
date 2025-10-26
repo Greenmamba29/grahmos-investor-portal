@@ -1,5 +1,6 @@
 import type { Handler } from '@netlify/functions';
-import { json, notionOperations } from './_notion';
+import { json, isAdminEmail } from './_db';
+import { dbOperations } from '../../src/lib/schema';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
@@ -36,7 +37,7 @@ export const handler: Handler = async (event) => {
       });
     }
 
-    const existingUser = await notionOperations.getUserByEmail(email);
+    const existingUser = await dbOperations.getUserByEmail(email);
     if (existingUser) {
       return json(409, {
         error: 'Email already registered',
@@ -52,22 +53,25 @@ export const handler: Handler = async (event) => {
     const userFirstName = firstName || nameParts[0] || '';
     const userLastName = lastName || nameParts.slice(1).join(' ') || '';
 
-    const user = await notionOperations.createUser({
+    // Determine user role - admin emails get admin role automatically
+    const userRole = isAdminEmail(email) ? 'admin' : (role === 'investor' ? 'investor' : 'standard');
+
+    const user = await dbOperations.createUser({
       email,
       firstName: userFirstName,
       lastName: userLastName,
-      password: passwordHash,
-      userType: role || 'standard',
-      role: role === 'investor' ? 'investor' : 'standard'
+      passwordHash,
+      userType: role || 'user',
+      role: userRole
     });
 
     const userSession = {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: user.first_name,
+      lastName: user.last_name,
       role: user.role,
-      userType: user.userType
+      userType: user.user_type
     };
 
     const token = authUtils.generateToken(userSession);

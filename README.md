@@ -1,16 +1,16 @@
 # GrahmOS Investor Portal
 
-🚀 **V2.0.0 - Simplified Notion-Based Authentication System**
+🚀 **V2.0.0 - Production-Ready Neon PostgreSQL Authentication System**
 
-The official investor portal and authentication hub for the GRAHMOS ecosystem (.info, .store, .com, .net, .io). This V2 release simplifies the architecture by using **Notion as the database**, making setup and management easier while maintaining all V1 features.
+The official investor portal and authentication hub for the GRAHMOS ecosystem (.info, .store, .com, .net, .io). This V2 release uses **Neon PostgreSQL** for serverless, scalable authentication with comprehensive role-based access control.
 
 ## 🏷️ **Version Information**
-- **Current Version**: V2.0.0 (Notion-based)
-- **Release Date**: January 2025
+- **Current Version**: V2.0.0 (Neon PostgreSQL)
+- **Release Date**: October 2025
 - **Status**: Production Ready ✅
 - **Live Site**: [https://grahmos.info](https://grahmos.info)
 - **Purpose**: Source of truth for GRAHMOS ecosystem authentication
-- **Database**: Notion (replaces PostgreSQL)
+- **Database**: Neon PostgreSQL (serverless, autoscaling)
 
 ## 🌟 **V1 Key Features**
 
@@ -18,10 +18,10 @@ The official investor portal and authentication hub for the GRAHMOS ecosystem (.
 - Complete signup/login/logout flow with JWT tokens
 - Password reset with secure token-based system
 - Role-based access control (Admin, Investor, Standard, Pending)
-- **Notion database** for user management (simplified from PostgreSQL)
+- **Neon PostgreSQL** for serverless, scalable user management
 - Email notifications for registrations and approvals
-- Session management with secure cookies
-- Easy user management through Notion's interface
+- Session management with secure HTTP-only cookies
+- Automated database migrations and schema management
 
 ### 🏢 **Company Progress Hub** 
 - Real-time updates on GRAHMOS development progress
@@ -171,10 +171,11 @@ npm run dev
 
 ### **Backend & Database**
 - **Netlify Functions** - Serverless API endpoints
-- **Notion API** - Database and user management
-- **JWT Tokens** - Session management
+- **Neon PostgreSQL** - Serverless, autoscaling database
+- **@neondatabase/serverless** - Optimized Postgres client
+- **JWT Tokens** - Session management with HTTP-only cookies
 - **bcrypt** - Password hashing (12 rounds)
-- **Email Service** - Automated notifications
+- **SendGrid** - Email service for notifications
 
 ### **Authentication & Security**
 - Custom JWT-based authentication system
@@ -189,15 +190,15 @@ npm run dev
 - **Environment Variables** - Configuration management
 - **Error Boundaries** - Graceful error handling
 
-## 📊 **Notion Database Setup**
+## 📊 **Neon PostgreSQL Setup**
 
-This project uses **Notion as the database** for user management. See [NOTION_SETUP.md](./NOTION_SETUP.md) for detailed setup instructions.
+This project uses **Neon PostgreSQL** - a serverless, autoscaling Postgres platform. See [NEON_SETUP.md](./NEON_SETUP.md) for detailed setup instructions.
 
 ### Quick Setup
 
-1. **Create a Notion Integration**:
-   - Go to https://www.notion.so/my-integrations
-   - Create a new integration and get the API token
+1. **Create a Neon Account**:
+   - Go to https://console.neon.tech
+   - Create a new project and get the connection string
 
 2. **Create a Notion Database**:
    - Create a full-page database in Notion

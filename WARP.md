@@ -19,6 +19,12 @@ npm run validate-env
 # Test database connection
 npm run test:db
 
+# Setup test accounts for authentication testing
+npm run setup:test-accounts
+
+# Run automated authentication flow tests (requires dev server)
+npm run test:auth
+
 # Sync local environment variables to Netlify
 npm run env:sync
 ```
@@ -155,12 +161,44 @@ Critical environment variables managed through deployment validation system:
 
 ## Testing Approach
 
+### Test Accounts
+Three test accounts are available for authentication testing:
+
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | admin@grahmos.info | TestAdmin123! |
+| **Investor** | investor@test.com | TestInvestor123! |
+| **Standard** | standard@test.com | TestStandard123! |
+
+Setup or reset test accounts:
+```bash
+npm run setup:test-accounts
+```
+
+### Automated Testing
+```bash
+# Run complete auth flow test (login, session, logout)
+npm run test:auth
+```
+
+This validates:
+- Database connectivity to Neon PostgreSQL
+- Account creation and credential management
+- Login endpoint functionality
+- JWT session token generation and validation
+- Logout and session cleanup
+- Role-based access for all user types
+
+### Manual Testing
+See `TESTING_GUIDE.md` for detailed manual testing procedures.
+
 Manual testing checklist covers:
 - Authentication flows (signup, login, logout, password reset)
 - Role assignment and upgrade workflows  
 - Route protection and access control
 - Admin approval processes
 - Database operations and migrations
+- Frictionless sign-in/sign-out experience
 
 The codebase prioritizes production stability with comprehensive error handling, environment validation, and role-based security throughout the application architecture.
 

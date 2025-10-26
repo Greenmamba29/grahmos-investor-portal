@@ -31,6 +31,8 @@
     "deploy:safe": "npm run validate-deployment && netlify deploy --prod",
     "deploy:validated": "npm run validate-env && npm run validate-deployment && netlify deploy --prod",
     "test:db": "node test-database-connection.js",
+    "test:auth": "tsx scripts/test-auth-flow.ts",
+    "setup:test-accounts": "tsx scripts/setup-test-accounts.ts",
     "env:sync": "node -e \"import('./scripts/deploy.js').then(m => m.syncEnvironmentVariables())\""
   },
   "dependencies": {
@@ -115,6 +117,7 @@
     "netlify-cli": "^23.1.4",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
+    "tsx": "^4.20.6",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
